@@ -18,11 +18,12 @@ Keine Installation, keine Accounts, läuft im Browser. Mobilfähig.
 | Feld        | Typ                        | Wertebereich                  | Default |
 |-------------|----------------------------|-------------------------------|---------|
 | Grad        | Textfeld mit Autocomplete  | Freitext + Vorschläge Font-Skala (3 – 8c+) via `<datalist>` | leer |
-| Versuche    | Zahl                       | ≥ 1                           | 1       |
+| Versuche    | Stepper (− / +)            | ≥ 1, kein Keyboard-Popup      | 1       |
 | Geschafft   | Checkbox / Haken           | ja / nein                     | nein    |
 | Stil        | Textfeld                   | Freitext (z. B. `crimp`, `sloper`, `dyn`) | leer |
 
 - Eintrag hinzufügen per Button **+** oder **Enter**-Taste
+- Nach dem Hinzufügen bleibt der Grad stehen (schnelles Nachloggen gleicher Schwierigkeit)
 - Gleicher Grad kann mehrfach eingetragen werden (mehrere Probleme)
 
 ---
