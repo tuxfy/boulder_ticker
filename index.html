@@ -94,7 +94,12 @@
       padding: 0.625rem 1rem;
     }
 
-    .tool-header h1 { justify-self: start; }
+    .tool-header h1 {
+      justify-self: start;
+      font-size: 1rem;
+      font-weight: 700;
+      color: #fff;
+    }
 
     .btn-tools {
       background: #1e1e1e;
@@ -114,18 +119,14 @@
     }
     .btn-tools:active { background: #272727; }
 
-    .tool-header h1 {
-      font-size: 1rem;
-      font-weight: 700;
-      color: #fff;
-    }
-
     .tool-content {
       padding: 1.25rem 1rem;
       max-width: 480px;
       margin: 0 auto;
       width: 100%;
       flex: 1;
+      display: flex;
+      flex-direction: column;
     }
 
     /* ── BOULDER LOG ── */
@@ -167,9 +168,10 @@
       border: none;
       color: #aaa;
       font-size: 1.2rem;
-      width: 2rem;
+      width: 2.25rem;
       cursor: pointer;
       flex-shrink: 0;
+      -webkit-tap-highlight-color: transparent;
     }
     .stepper button:active { background: #2a2a2a; }
     .stepper span {
@@ -216,9 +218,7 @@
     }
     .btn-add:active { background: #2d63b0; }
 
-    .style-row {
-      margin-bottom: 1.25rem;
-    }
+    .style-row { margin-bottom: 1.25rem; }
     .style-row input[type="text"] {
       background: #1e1e1e;
       border: 1px solid #2a2a2a;
@@ -251,10 +251,7 @@
     }
     #log:focus { outline: none; border-color: #3a7bd5; }
 
-    .actions {
-      display: flex;
-      gap: 0.5rem;
-    }
+    .actions { display: flex; gap: 0.5rem; }
     .btn-copy {
       flex: 1;
       background: #1e1e1e;
@@ -283,6 +280,137 @@
     .btn-reset:active { background: #2a1e1e; }
 
     input::placeholder, textarea::placeholder { color: #555; }
+
+    /* ── TIMER ── */
+    .timer-params {
+      display: flex;
+      flex-direction: column;
+      margin-bottom: 1.5rem;
+    }
+    .timer-param {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.75rem 0;
+      border-bottom: 1px solid #1e1e1e;
+    }
+    .timer-params .timer-param:first-child { border-top: 1px solid #1e1e1e; }
+    .timer-param-label { font-size: 0.95rem; color: #ccc; }
+    .timer-param-right {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .timer-stepper input {
+      flex: 1;
+      background: none;
+      border: none;
+      color: #fff;
+      font-size: 1rem;
+      text-align: center;
+      min-width: 3rem;
+      width: 3rem;
+      padding: 0;
+      -webkit-appearance: none;
+      appearance: none;
+    }
+    .timer-stepper input:focus { outline: none; color: #fff; }
+    .timer-param-unit { font-size: 0.85rem; color: #555; width: 0.75rem; }
+
+    .btn-timer-start {
+      width: 100%;
+      background: #fff;
+      border: none;
+      border-radius: 12px;
+      color: #111;
+      font-size: 1.1rem;
+      font-weight: 700;
+      padding: 1rem;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .btn-timer-start:active { background: #ddd; }
+
+    /* timer active display */
+    #timer-display {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      padding: 2.5rem 0 1rem;
+      text-align: center;
+    }
+
+    .timer-phase-label {
+      font-size: 1rem;
+      font-weight: 700;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: #555;
+      transition: color 0.3s;
+    }
+    .timer-phase-label.work  { color: #e05555; }
+    .timer-phase-label.rest  { color: #6bcb77; }
+
+    .timer-time {
+      font-size: 6rem;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      color: #fff;
+      line-height: 1;
+      font-variant-numeric: tabular-nums;
+    }
+    @keyframes timerpulse {
+      0%   { transform: scale(1); }
+      40%  { transform: scale(1.07); }
+      100% { transform: scale(1); }
+    }
+    .timer-time.pulse { animation: timerpulse 0.22s ease-out; }
+
+    .timer-progress {
+      font-size: 0.9rem;
+      color: #555;
+      letter-spacing: 0.03em;
+      min-height: 1.2em;
+    }
+
+    .timer-controls {
+      display: flex;
+      gap: 0.75rem;
+      width: 100%;
+    }
+    .btn-timer-pause {
+      flex: 1;
+      background: #1e1e1e;
+      border: 1px solid #2a2a2a;
+      border-radius: 12px;
+      color: #e0e0e0;
+      font-size: 1rem;
+      font-weight: 600;
+      padding: 0.875rem;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .btn-timer-pause:active { background: #272727; }
+    .btn-timer-abort {
+      background: #1e1a1a;
+      border: 1px solid #3a2222;
+      border-radius: 12px;
+      color: #e05555;
+      font-size: 1rem;
+      font-weight: 600;
+      padding: 0.875rem 1.25rem;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .btn-timer-abort:active { background: #2a1e1e; }
+
+    /* phase background on content area */
+    #timer-content { transition: background 0.4s ease; }
+    #timer-content.phase-work     { background: #2d0f0f; }
+    #timer-content.phase-rest     { background: #0f2d1a; }
+    #timer-content.phase-set-pause { background: #0f2d1a; }
   </style>
 </head>
 <body>
@@ -292,8 +420,9 @@
     <h1 class="home-title">Bouldering Berlin</h1>
     <p class="home-section">Tools</p>
     <div class="tool-grid">
+
       <button class="tile" onclick="navigate('boulderlog')">
-        <svg width="52" height="52" viewBox="0 0 52 52" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <svg width="52" height="52" viewBox="0 0 52 52" fill="none" aria-hidden="true">
           <rect x="5" y="3" width="30" height="38" rx="5" fill="white" fill-opacity="0.12"/>
           <line x1="11" y1="13" x2="29" y2="13" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-opacity="0.7"/>
           <line x1="11" y1="20" x2="29" y2="20" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-opacity="0.7"/>
@@ -303,6 +432,19 @@
         </svg>
         <span class="tile-label">Boulder Log</span>
       </button>
+
+      <button class="tile" onclick="navigate('timer')">
+        <svg width="52" height="52" viewBox="0 0 52 52" fill="none" aria-hidden="true">
+          <circle cx="26" cy="30" r="17" fill="white" fill-opacity="0.12" stroke="white" stroke-opacity="0.75" stroke-width="2.5"/>
+          <rect x="21" y="9" width="10" height="5" rx="2.5" fill="white" fill-opacity="0.65"/>
+          <line x1="17" y1="14" x2="14" y2="11" stroke="white" stroke-opacity="0.45" stroke-width="2" stroke-linecap="round"/>
+          <line x1="26" y1="30" x2="26" y2="19" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+          <line x1="26" y1="30" x2="35" y2="30" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+          <circle cx="26" cy="30" r="2.5" fill="white"/>
+        </svg>
+        <span class="tile-label">Timer</span>
+      </button>
+
     </div>
   </div>
 
@@ -348,9 +490,102 @@
     </div>
   </div>
 
+  <!-- TIMER -->
+  <div id="screen-timer" class="tool-screen" hidden>
+    <header class="tool-header">
+      <h1>Timer</h1>
+      <button class="btn-tools" onclick="navigate('')">⊞ Tools</button>
+    </header>
+    <div class="tool-content" id="timer-content">
+
+      <!-- CONFIG -->
+      <div id="timer-config">
+        <div class="timer-params">
+          <div class="timer-param">
+            <span class="timer-param-label">Work</span>
+            <div class="timer-param-right">
+              <div class="stepper timer-stepper">
+                <button type="button" onclick="adjustParam('work',-1)">−</button>
+                <input type="text" inputmode="numeric" pattern="[0-9]*" id="val-work" value="45"
+                       oninput="onParamInput('work')" onblur="clampParam('work')">
+                <button type="button" onclick="adjustParam('work',1)">+</button>
+              </div>
+              <span class="timer-param-unit">s</span>
+            </div>
+          </div>
+          <div class="timer-param">
+            <span class="timer-param-label">Rest</span>
+            <div class="timer-param-right">
+              <div class="stepper timer-stepper">
+                <button type="button" onclick="adjustParam('rest',-1)">−</button>
+                <input type="text" inputmode="numeric" pattern="[0-9]*" id="val-rest" value="90"
+                       oninput="onParamInput('rest')" onblur="clampParam('rest')">
+                <button type="button" onclick="adjustParam('rest',1)">+</button>
+              </div>
+              <span class="timer-param-unit">s</span>
+            </div>
+          </div>
+          <div class="timer-param">
+            <span class="timer-param-label">Anzahl Work</span>
+            <div class="timer-param-right">
+              <div class="stepper timer-stepper">
+                <button type="button" onclick="adjustParam('numWork',-1)">−</button>
+                <input type="text" inputmode="numeric" pattern="[0-9]*" id="val-numWork" value="5"
+                       oninput="onParamInput('numWork')" onblur="clampParam('numWork')">
+                <button type="button" onclick="adjustParam('numWork',1)">+</button>
+              </div>
+              <span class="timer-param-unit"></span>
+            </div>
+          </div>
+          <div class="timer-param">
+            <span class="timer-param-label">Anzahl Sets</span>
+            <div class="timer-param-right">
+              <div class="stepper timer-stepper">
+                <button type="button" onclick="adjustParam('numSets',-1)">−</button>
+                <input type="text" inputmode="numeric" pattern="[0-9]*" id="val-numSets" value="2"
+                       oninput="onParamInput('numSets')" onblur="clampParam('numSets')">
+                <button type="button" onclick="adjustParam('numSets',1)">+</button>
+              </div>
+              <span class="timer-param-unit"></span>
+            </div>
+          </div>
+          <div class="timer-param">
+            <span class="timer-param-label">Set-Pause</span>
+            <div class="timer-param-right">
+              <div class="stepper timer-stepper">
+                <button type="button" onclick="adjustParam('setPause',-1)">−</button>
+                <input type="text" inputmode="numeric" pattern="[0-9]*" id="val-setPause" value="180"
+                       oninput="onParamInput('setPause')" onblur="clampParam('setPause')">
+                <button type="button" onclick="adjustParam('setPause',1)">+</button>
+              </div>
+              <span class="timer-param-unit">s</span>
+            </div>
+          </div>
+        </div>
+        <button class="btn-timer-start" onclick="timerStart()">Start</button>
+      </div>
+
+      <!-- DISPLAY -->
+      <div id="timer-display" hidden>
+        <div class="timer-phase-label" id="timer-phase">VORBEREITUNG</div>
+        <div class="timer-time" id="timer-time">0:10</div>
+        <div class="timer-progress" id="timer-progress"></div>
+        <div class="timer-controls">
+          <button class="btn-timer-pause" id="btn-pause" onclick="timerTogglePause()">Pause</button>
+          <button class="btn-timer-abort" onclick="timerReset()">Reset</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
   <script>
     // ── ROUTING ──────────────────────────────────────────────────
-    const SCREENS = { '': 'screen-home', 'boulderlog': 'screen-boulderlog' };
+    const SCREENS = {
+      '':           'screen-home',
+      'boulderlog': 'screen-boulderlog',
+      'timer':      'screen-timer',
+    };
 
     function navigate(tool) {
       location.hash = tool ? `/${tool}` : '/';
@@ -426,6 +661,251 @@
 
     gradeEl.addEventListener('keydown', e => { if (e.key === 'Enter') addEntry(); });
     styleEl.addEventListener('keydown', e => { if (e.key === 'Enter') addEntry(); });
+
+    // ── TIMER ─────────────────────────────────────────────────────
+    const TIMER_KEY = 'timer_cfg';
+    const PREP_SECS = 10;
+
+    const PARAM_META = {
+      work:     { min: 1,  max: 600 },
+      rest:     { min: 1,  max: 600 },
+      numWork:  { min: 1,  max: 30  },
+      numSets:  { min: 1,  max: 20  },
+      setPause: { min: 1,  max: 600 },
+    };
+
+    let cfg = { work: 45, rest: 90, numWork: 5, numSets: 2, setPause: 180 };
+
+    (function loadTimerCfg() {
+      try {
+        const saved = JSON.parse(localStorage.getItem(TIMER_KEY));
+        if (saved) {
+          Object.keys(cfg).forEach(k => { if (saved[k] != null) cfg[k] = saved[k]; });
+          Object.keys(cfg).forEach(k => {
+            document.getElementById(`val-${k}`).value = cfg[k];
+          });
+        }
+      } catch (_) {}
+    })();
+
+    function saveTimerCfg() {
+      localStorage.setItem(TIMER_KEY, JSON.stringify(cfg));
+    }
+
+    function adjustParam(key, delta) {
+      const { min, max } = PARAM_META[key];
+      const input = document.getElementById(`val-${key}`);
+      const current = parseInt(input.value);
+      cfg[key] = Math.min(max, Math.max(min, (isNaN(current) ? cfg[key] : current) + delta));
+      input.value = cfg[key];
+      saveTimerCfg();
+    }
+
+    function onParamInput(key) {
+      const val = parseInt(document.getElementById(`val-${key}`).value);
+      if (!isNaN(val)) { cfg[key] = val; saveTimerCfg(); }
+    }
+
+    function clampParam(key) {
+      const { min, max } = PARAM_META[key];
+      const input = document.getElementById(`val-${key}`);
+      const val = parseInt(input.value);
+      cfg[key] = Math.min(max, Math.max(min, isNaN(val) ? cfg[key] : val));
+      input.value = cfg[key];
+      saveTimerCfg();
+    }
+
+    // timer state
+    let tState = null;
+    let tInterval = null;
+
+    function timerStart() {
+      saveTimerCfg();
+      tState = { phase: 'prep', timeLeft: PREP_SECS, workIdx: 1, setIdx: 1, paused: false };
+      document.getElementById('timer-config').hidden = true;
+      document.getElementById('timer-display').hidden = false;
+      updateTimerDisplay();
+      requestWakeLock();
+      tInterval = setInterval(timerTick, 1000);
+    }
+
+    function timerTick() {
+      if (tState.paused) return;
+      tState.timeLeft--;
+
+      if (tState.timeLeft <= 0) {
+        playBeep(440, 0.35);
+        advancePhase();
+      } else {
+        if (tState.timeLeft <= 3) playBeep(880, 0.08);
+        if (tState.timeLeft <= 3) pulseTime();
+        updateTimerDisplay();
+      }
+    }
+
+    function advancePhase() {
+      const { phase, workIdx, setIdx } = tState;
+
+      if (phase === 'prep') {
+        tState.phase = 'work';
+        tState.timeLeft = cfg.work;
+
+      } else if (phase === 'work') {
+        const lastWork = workIdx >= cfg.numWork;
+        const lastSet  = setIdx  >= cfg.numSets;
+
+        if (lastWork && lastSet) {
+          tState.phase = 'done';
+          clearInterval(tInterval);
+          releaseWakeLock();
+          playFinish();
+          updateTimerDisplay();
+          setTimeout(timerReset, 2500);
+          return;
+        } else if (lastWork) {
+          tState.phase = 'set-pause';
+          tState.timeLeft = cfg.setPause;
+        } else {
+          tState.phase = 'rest';
+          tState.timeLeft = cfg.rest;
+        }
+
+      } else if (phase === 'rest') {
+        tState.workIdx++;
+        tState.phase = 'work';
+        tState.timeLeft = cfg.work;
+
+      } else if (phase === 'set-pause') {
+        tState.setIdx++;
+        tState.workIdx = 1;
+        tState.phase = 'work';
+        tState.timeLeft = cfg.work;
+      }
+
+      updateTimerDisplay();
+    }
+
+    function updateTimerDisplay() {
+      const { phase, timeLeft, workIdx, setIdx } = tState;
+      const phaseEl    = document.getElementById('timer-phase');
+      const timeEl     = document.getElementById('timer-time');
+      const progressEl = document.getElementById('timer-progress');
+      const content    = document.getElementById('timer-content');
+
+      const labels = {
+        prep:       'Vorbereitung',
+        work:       'Work',
+        rest:       'Rest',
+        'set-pause':'Set-Pause',
+        done:       'Fertig',
+      };
+      phaseEl.textContent = labels[phase] ?? phase;
+      phaseEl.className = 'timer-phase-label';
+      if (phase === 'work') phaseEl.classList.add('work');
+      if (phase === 'rest' || phase === 'set-pause') phaseEl.classList.add('rest');
+
+      timeEl.textContent = phase === 'done' ? '—' : formatTime(timeLeft);
+
+      content.className = 'tool-content';
+      if (phase === 'work')      content.classList.add('phase-work');
+      if (phase === 'rest')      content.classList.add('phase-rest');
+      if (phase === 'set-pause') content.classList.add('phase-set-pause');
+
+      if (phase === 'work' || phase === 'rest') {
+        progressEl.textContent = `Work ${workIdx} / ${cfg.numWork} · Set ${setIdx} / ${cfg.numSets}`;
+      } else if (phase === 'set-pause') {
+        progressEl.textContent = `Set ${setIdx} / ${cfg.numSets} abgeschlossen`;
+      } else {
+        progressEl.textContent = '';
+      }
+
+      const pauseBtn = document.getElementById('btn-pause');
+      if (phase === 'done') {
+        pauseBtn.hidden = true;
+      } else {
+        pauseBtn.hidden = false;
+        pauseBtn.textContent = tState.paused ? 'Weiter' : 'Pause';
+      }
+    }
+
+    function timerTogglePause() {
+      tState.paused = !tState.paused;
+      document.getElementById('btn-pause').textContent = tState.paused ? 'Weiter' : 'Pause';
+      if (tState.paused) releaseWakeLock();
+      else requestWakeLock();
+    }
+
+    function timerReset() {
+      clearInterval(tInterval);
+      tInterval = null;
+      tState = null;
+      releaseWakeLock();
+      document.getElementById('timer-display').hidden = true;
+      document.getElementById('timer-config').hidden = false;
+      document.getElementById('timer-content').className = 'tool-content';
+    }
+
+    function formatTime(secs) {
+      const m = Math.floor(secs / 60);
+      const s = secs % 60;
+      return `${m}:${s.toString().padStart(2, '0')}`;
+    }
+
+    function pulseTime() {
+      const el = document.getElementById('timer-time');
+      el.classList.remove('pulse');
+      void el.offsetWidth;
+      el.classList.add('pulse');
+    }
+
+    // ── AUDIO ─────────────────────────────────────────────────────
+    let audioCtx = null;
+
+    function getAudioCtx() {
+      if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+      return audioCtx;
+    }
+
+    function playBeep(freq, dur) {
+      try {
+        const ctx  = getAudioCtx();
+        const osc  = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.frequency.value = freq;
+        osc.type = 'sine';
+        gain.gain.setValueAtTime(0.25, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + dur);
+        osc.start(ctx.currentTime);
+        osc.stop(ctx.currentTime + dur);
+      } catch (_) {}
+    }
+
+    function playFinish() {
+      [0, 0.18, 0.36].forEach(t => {
+        setTimeout(() => playBeep(660, 0.2), t * 1000);
+      });
+    }
+
+    // ── WAKE LOCK ─────────────────────────────────────────────────
+    let wakeLock = null;
+
+    async function requestWakeLock() {
+      if (!('wakeLock' in navigator)) return;
+      try { wakeLock = await navigator.wakeLock.request('screen'); } catch (_) {}
+    }
+
+    function releaseWakeLock() {
+      if (wakeLock) { wakeLock.release(); wakeLock = null; }
+    }
+
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible' && tState && !tState.paused) {
+        requestWakeLock();
+      }
+    });
   </script>
 
 </body>

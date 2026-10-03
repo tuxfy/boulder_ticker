@@ -50,12 +50,12 @@ Secrets (API-Tokens, Passwörter, Schlüssel) werden niemals ausgegeben oder gel
 
 ## Workflow
 
-**Pflicht: Kein Code ohne zugehöriges Anforderungsdokument.** Reihenfolge ist verbindlich:
+**Pflicht: Kein Code ohne zugehöriges Anforderungsdokument und explizites Go.** Reihenfolge ist verbindlich:
 
 1. Anforderungsdokument in `anforderungen/` anlegen, Status `new`
-2. Anforderung ausschärfen — Hintergrund, Verhalten, Akzeptanzkriterien ergänzen — mit dem Nutzer abstimmen → Status `refined`
-3. Erst nach expliziter Freigabe durch den Nutzer: Status auf `in progress` setzen
-4. Implementieren
+2. Anforderung ausschärfen — Hintergrund, Verhalten, Akzeptanzkriterien ergänzen — mit dem Nutzer abstimmen; **der Nutzer setzt den Status auf `refined`**
+3. Warten auf explizites **„Go"** des Nutzers — kein Code, kein Planen von Implementierungsdetails vorher
+4. Status auf `in progress` setzen, dann implementieren
 5. Jeden AK-Punkt prüfen und abhaken
 6. Status auf `done` setzen
 
