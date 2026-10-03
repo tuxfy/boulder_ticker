@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Boulder Log</title>
+  <title>Bouldering Berlin</title>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -12,20 +12,123 @@
       background: #111;
       color: #e0e0e0;
       min-height: 100dvh;
-      padding: 1.25rem 1rem;
+    }
+
+    [hidden] { display: none !important; }
+
+    /* ── HOME ── */
+    #screen-home {
+      padding: 2rem 1.25rem 1.25rem;
       max-width: 480px;
       margin: 0 auto;
     }
 
-    h1 {
-      font-size: 1.25rem;
-      font-weight: 700;
+    .home-title {
+      font-size: 1.5rem;
+      font-weight: 800;
       color: #fff;
-      margin-bottom: 1.25rem;
-      letter-spacing: -0.01em;
+      letter-spacing: -0.02em;
+      margin-bottom: 0.2rem;
     }
 
-    /* --- input area --- */
+    .home-section {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: #555;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 1.75rem;
+    }
+
+    .tool-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1rem;
+    }
+
+    .tile {
+      aspect-ratio: 1;
+      background: #1e1e1e;
+      border: 1px solid #2a2a2a;
+      border-radius: 18px;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 0.6rem;
+      padding: 1rem;
+      -webkit-tap-highlight-color: transparent;
+      transition: transform 0.1s, background 0.1s;
+    }
+    .tile:active {
+      background: #272727;
+      transform: scale(0.95);
+    }
+
+    .tile-icon { display: flex; }
+
+    .tile-label {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #e0e0e0;
+      text-align: center;
+    }
+
+    /* ── TOOL SHELL ── */
+    .tool-screen {
+      display: flex;
+      flex-direction: column;
+      min-height: 100dvh;
+    }
+
+    .tool-header {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      background: #111;
+      border-bottom: 1px solid #1e1e1e;
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+      padding: 0.625rem 1rem;
+    }
+
+    .tool-header h1 { justify-self: start; }
+
+    .btn-tools {
+      background: #1e1e1e;
+      border: 1px solid #2a2a2a;
+      border-radius: 10px;
+      color: #ccc;
+      font-size: 0.9rem;
+      font-weight: 600;
+      padding: 0.45rem 0.875rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+      white-space: nowrap;
+      min-height: 40px;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .btn-tools:active { background: #272727; }
+
+    .tool-header h1 {
+      font-size: 1rem;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .tool-content {
+      padding: 1.25rem 1rem;
+      max-width: 480px;
+      margin: 0 auto;
+      width: 100%;
+      flex: 1;
+    }
+
+    /* ── BOULDER LOG ── */
     .input-grid {
       display: grid;
       grid-template-columns: 1fr auto 2.75rem 2.75rem;
@@ -36,7 +139,7 @@
 
     .input-grid input[type="text"] {
       background: #1e1e1e;
-      border: 1px solid #2e2e2e;
+      border: 1px solid #2a2a2a;
       border-radius: 8px;
       color: #fff;
       font-size: 1rem;
@@ -50,13 +153,12 @@
       border-color: #3a7bd5;
     }
 
-    /* stepper */
     .stepper {
       display: flex;
       align-items: stretch;
       height: 44px;
       background: #1e1e1e;
-      border: 1px solid #2e2e2e;
+      border: 1px solid #2a2a2a;
       border-radius: 8px;
       overflow: hidden;
     }
@@ -69,7 +171,7 @@
       cursor: pointer;
       flex-shrink: 0;
     }
-    .stepper button:active { background: #2e2e2e; }
+    .stepper button:active { background: #2a2a2a; }
     .stepper span {
       flex: 1;
       display: flex;
@@ -81,11 +183,10 @@
       user-select: none;
     }
 
-    /* send toggle button */
     .btn-send {
       height: 44px;
       background: #1e1e1e;
-      border: 1px solid #2e2e2e;
+      border: 1px solid #2a2a2a;
       border-radius: 8px;
       color: #666;
       font-size: 0.75rem;
@@ -100,7 +201,6 @@
       color: #6bcb77;
     }
 
-    /* add button */
     .btn-add {
       background: #3a7bd5;
       border: none;
@@ -116,13 +216,12 @@
     }
     .btn-add:active { background: #2d63b0; }
 
-    /* style row */
     .style-row {
       margin-bottom: 1.25rem;
     }
     .style-row input[type="text"] {
       background: #1e1e1e;
-      border: 1px solid #2e2e2e;
+      border: 1px solid #2a2a2a;
       border-radius: 8px;
       color: #fff;
       font-size: 1rem;
@@ -135,14 +234,12 @@
       outline: none;
       border-color: #3a7bd5;
     }
-    .style-row input::placeholder { color: #555; }
 
-    /* --- textarea --- */
     #log {
       width: 100%;
       min-height: 180px;
       background: #1a1a1a;
-      border: 1px solid #2e2e2e;
+      border: 1px solid #2a2a2a;
       border-radius: 8px;
       color: #e0e0e0;
       font-family: monospace;
@@ -154,7 +251,6 @@
     }
     #log:focus { outline: none; border-color: #3a7bd5; }
 
-    /* --- action buttons --- */
     .actions {
       display: flex;
       gap: 0.5rem;
@@ -162,14 +258,14 @@
     .btn-copy {
       flex: 1;
       background: #1e1e1e;
-      border: 1px solid #2e2e2e;
+      border: 1px solid #2a2a2a;
       border-radius: 8px;
       color: #e0e0e0;
       font-size: 0.95rem;
       padding: 0.7rem 1rem;
       cursor: pointer;
     }
-    .btn-copy:hover { background: #272727; }
+    .btn-copy:active { background: #272727; }
     .btn-copy.copied {
       background: #1a2e1a;
       border-color: #2a4a2a;
@@ -184,49 +280,95 @@
       padding: 0.7rem 1rem;
       cursor: pointer;
     }
-    .btn-reset:hover { background: #2a1e1e; }
+    .btn-reset:active { background: #2a1e1e; }
 
-    input::placeholder { color: #555; }
+    input::placeholder, textarea::placeholder { color: #555; }
   </style>
 </head>
 <body>
 
-  <h1>Boulder Log</h1>
-
-  <div class="input-grid">
-    <input type="text" id="grade" list="grade-list" placeholder="Grad" autocomplete="off">
-    <div class="stepper">
-      <button type="button" onclick="changeTries(-1)">−</button>
-      <span id="tries-val">1</span>
-      <button type="button" onclick="changeTries(1)">+</button>
+  <!-- HOME -->
+  <div id="screen-home">
+    <h1 class="home-title">Bouldering Berlin</h1>
+    <p class="home-section">Tools</p>
+    <div class="tool-grid">
+      <button class="tile" onclick="navigate('boulderlog')">
+        <svg width="52" height="52" viewBox="0 0 52 52" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <rect x="5" y="3" width="30" height="38" rx="5" fill="white" fill-opacity="0.12"/>
+          <line x1="11" y1="13" x2="29" y2="13" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-opacity="0.7"/>
+          <line x1="11" y1="20" x2="29" y2="20" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-opacity="0.7"/>
+          <line x1="11" y1="27" x2="20" y2="27" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-opacity="0.7"/>
+          <circle cx="37" cy="39" r="12" fill="white"/>
+          <path d="M31 39 l5 5 l9-9" stroke="#1e1e1e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <span class="tile-label">Boulder Log</span>
+      </button>
     </div>
-    <button type="button" id="send-btn" class="btn-send" onclick="toggleSend()">send</button>
-    <button class="btn-add" onclick="addEntry()" title="Hinzufügen">+</button>
   </div>
 
-  <datalist id="grade-list">
-    <option value="3"><option value="4"><option value="5"><option value="5+">
-    <option value="6a"><option value="6a+"><option value="6b"><option value="6b+">
-    <option value="6c"><option value="6c+"><option value="7a"><option value="7a+">
-    <option value="7b"><option value="7b+"><option value="7c"><option value="7c+">
-    <option value="8a"><option value="8a+"><option value="8b"><option value="8b+">
-    <option value="8c"><option value="8c+">
-  </datalist>
+  <!-- BOULDER LOG -->
+  <div id="screen-boulderlog" class="tool-screen" hidden>
+    <header class="tool-header">
+      <h1>Boulder Log</h1>
+      <button class="btn-tools" onclick="navigate('')">⊞ Tools</button>
+    </header>
+    <div class="tool-content">
 
-  <div class="style-row">
-    <input type="text" id="style" placeholder="Stil (crimp, sloper, dyn …)" autocomplete="off">
-  </div>
+      <div class="input-grid">
+        <input type="text" id="grade" list="grade-list" placeholder="Grad" autocomplete="off">
+        <div class="stepper">
+          <button type="button" onclick="changeTries(-1)">−</button>
+          <span id="tries-val">1</span>
+          <button type="button" onclick="changeTries(1)">+</button>
+        </div>
+        <button type="button" id="send-btn" class="btn-send" onclick="toggleSend()">send</button>
+        <button class="btn-add" onclick="addEntry()">+</button>
+      </div>
 
-  <textarea id="log" placeholder="Noch keine Einträge …" spellcheck="false"></textarea>
+      <datalist id="grade-list">
+        <option value="3"><option value="4"><option value="5"><option value="5+">
+        <option value="6a"><option value="6a+"><option value="6b"><option value="6b+">
+        <option value="6c"><option value="6c+"><option value="7a"><option value="7a+">
+        <option value="7b"><option value="7b+"><option value="7c"><option value="7c+">
+        <option value="8a"><option value="8a+"><option value="8b"><option value="8b+">
+        <option value="8c"><option value="8c+">
+      </datalist>
 
-  <div class="actions">
-    <button class="btn-copy" id="copyBtn" onclick="copyLog()">Kopieren</button>
-    <button class="btn-reset" onclick="resetLog()">Reset</button>
+      <div class="style-row">
+        <input type="text" id="style" placeholder="Stil (crimp, sloper, dyn …)" autocomplete="off">
+      </div>
+
+      <textarea id="log" placeholder="Noch keine Einträge …" spellcheck="false"></textarea>
+
+      <div class="actions">
+        <button class="btn-copy" id="copyBtn" onclick="copyLog()">Kopieren</button>
+        <button class="btn-reset" onclick="resetLog()">Reset</button>
+      </div>
+
+    </div>
   </div>
 
   <script>
-    const KEY = 'boulder_log';
+    // ── ROUTING ──────────────────────────────────────────────────
+    const SCREENS = { '': 'screen-home', 'boulderlog': 'screen-boulderlog' };
 
+    function navigate(tool) {
+      location.hash = tool ? `/${tool}` : '/';
+    }
+
+    function render() {
+      const tool = location.hash.replace(/^#\/?/, '');
+      const active = SCREENS[tool] ?? 'screen-home';
+      Object.values(SCREENS).forEach(id => {
+        document.getElementById(id).hidden = id !== active;
+      });
+    }
+
+    window.addEventListener('hashchange', render);
+    window.addEventListener('load', render);
+
+    // ── BOULDER LOG ───────────────────────────────────────────────
+    const KEY      = 'boulder_log';
     const logEl    = document.getElementById('log');
     const gradeEl  = document.getElementById('grade');
     const triesVal = document.getElementById('tries-val');
@@ -240,46 +382,26 @@
       triesVal.textContent = tries;
     }
 
-    function toggleSend() {
-      sendBtn.classList.toggle('active');
-    }
+    function toggleSend() { sendBtn.classList.toggle('active'); }
 
-    // select-all on focus prevents fiddly deletion
-    [gradeEl, styleEl].forEach(el =>
-      el.addEventListener('focus', () => el.select())
-    );
+    [gradeEl, styleEl].forEach(el => el.addEventListener('focus', () => el.select()));
 
-    // restore from session
     logEl.value = sessionStorage.getItem(KEY) || '';
+    logEl.addEventListener('input', () => sessionStorage.setItem(KEY, logEl.value));
 
-    logEl.addEventListener('input', () => {
-      sessionStorage.setItem(KEY, logEl.value);
-    });
-
-    function buildLine(grade, tries, send, style) {
-      const tryWord = tries === 1 ? 'try' : 'tries';
-      const sendPart = send ? ' (send)' : '';
-      const stylePart = style ? ` - ${style}` : '';
-      return `- ${grade}: ${tries} ${tryWord}${sendPart}${stylePart}`;
+    function buildLine(grade, t, send, style) {
+      return `- ${grade}: ${t} ${t === 1 ? 'try' : 'tries'}${send ? ' (send)' : ''}${style ? ` - ${style}` : ''}`;
     }
 
     function addEntry() {
       const grade = gradeEl.value.trim();
       if (!grade) { gradeEl.focus(); return; }
-
-      const triesCount = tries;
-      const send  = sendBtn.classList.contains('active');
-      const style = styleEl.value.trim();
-      const newLine = buildLine(grade, triesCount, send, style);
-
-      const current = logEl.value;
-      logEl.value = current ? current + '\n' + newLine : newLine;
+      const line = buildLine(grade, tries, sendBtn.classList.contains('active'), styleEl.value.trim());
+      logEl.value = logEl.value ? logEl.value + '\n' + line : line;
       sessionStorage.setItem(KEY, logEl.value);
-
-      // reset inputs
       tries = 1; triesVal.textContent = 1;
       sendBtn.classList.remove('active');
-      styleEl.value  = '';
+      styleEl.value = '';
       gradeEl.focus();
     }
 
@@ -290,10 +412,7 @@
         const btn = document.getElementById('copyBtn');
         btn.textContent = 'Kopiert ✓';
         btn.classList.add('copied');
-        setTimeout(() => {
-          btn.textContent = 'Kopieren';
-          btn.classList.remove('copied');
-        }, 2000);
+        setTimeout(() => { btn.textContent = 'Kopieren'; btn.classList.remove('copied'); }, 2000);
       });
     }
 
@@ -305,7 +424,6 @@
       }
     }
 
-    // Enter on grade or style triggers add
     gradeEl.addEventListener('keydown', e => { if (e.key === 'Enter') addEntry(); });
     styleEl.addEventListener('keydown', e => { if (e.key === 'Enter') addEntry(); });
   </script>

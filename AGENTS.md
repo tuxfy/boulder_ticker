@@ -50,9 +50,13 @@ Secrets (API-Tokens, Passwörter, Schlüssel) werden niemals ausgegeben oder gel
 
 ## Workflow
 
-1. Anforderung liegt als `new` vor
-2. Anforderung ausschärfen: Hintergrund, Verhalten, Akzeptanzkriterien ergänzen → Status `refined`
-3. Status auf `in progress` setzen beim Beginn der Umsetzung
+**Pflicht: Kein Code ohne zugehöriges Anforderungsdokument.** Reihenfolge ist verbindlich:
+
+1. Anforderungsdokument in `anforderungen/` anlegen, Status `new`
+2. Anforderung ausschärfen — Hintergrund, Verhalten, Akzeptanzkriterien ergänzen — mit dem Nutzer abstimmen → Status `refined`
+3. Erst nach expliziter Freigabe durch den Nutzer: Status auf `in progress` setzen
 4. Implementieren
 5. Jeden AK-Punkt prüfen und abhaken
 6. Status auf `done` setzen
+
+Wird im Gespräch eine neue Idee oder Erweiterung besprochen, wird **zuerst** ein Anforderungsdokument angelegt (oder ein bestehendes ergänzt), bevor irgendein Code geschrieben oder geplant wird.
