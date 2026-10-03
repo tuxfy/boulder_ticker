@@ -31,7 +31,7 @@ Keine Installation, keine Accounts, läuft im Browser. Mobilfähig.
 ## Ausgabe / Ergebnisfeld
 
 - Zentrales **editierbares Textfeld** (Textarea) zeigt die gesammelte Liste
-- **Add** hängt den neuen Eintrag an der richtigen Stelle nach Schwierigkeit ein (Font-Skala-Reihenfolge)
+- **Add** hängt den neuen Eintrag chronologisch ans Ende an
 - Der Nutzer kann den Text im Feld jederzeit direkt bearbeiten (Tippfehler korrigieren, Zeilen umsortieren)
 - Inhalt der Textarea wird auch in SessionStorage gespeichert
 - Format pro Zeile:

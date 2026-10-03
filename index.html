@@ -225,9 +225,6 @@
   </div>
 
   <script>
-    const GRADES = ['3','4','5','5+','6a','6a+','6b','6b+','6c','6c+',
-                    '7a','7a+','7b','7b+','7c','7c+','8a','8a+','8b','8b+','8c','8c+'];
-    const GRADE_IDX = Object.fromEntries(GRADES.map((g, i) => [g, i]));
     const KEY = 'boulder_log';
 
     const logEl    = document.getElementById('log');
@@ -259,12 +256,6 @@
       sessionStorage.setItem(KEY, logEl.value);
     });
 
-    function gradeRank(grade) {
-      const g = grade.trim().toLowerCase();
-      const idx = GRADES.findIndex(x => x.toLowerCase() === g);
-      return idx === -1 ? 999 : idx;
-    }
-
     function buildLine(grade, tries, send, style) {
       const tryWord = tries === 1 ? 'try' : 'tries';
       const sendPart = send ? ' (send)' : '';
@@ -280,23 +271,9 @@
       const send  = sendBtn.classList.contains('active');
       const style = styleEl.value.trim();
       const newLine = buildLine(grade, triesCount, send, style);
-      const newRank = gradeRank(grade);
 
       const current = logEl.value;
-      const lines = current ? current.split('\n') : [];
-
-      // find insertion index: after last line with rank <= newRank
-      let insertAt = lines.length;
-      for (let i = 0; i < lines.length; i++) {
-        const m = lines[i].match(/^- ([^:]+):/);
-        if (m && gradeRank(m[1]) > newRank) {
-          insertAt = i;
-          break;
-        }
-      }
-
-      lines.splice(insertAt, 0, newLine);
-      logEl.value = lines.join('\n');
+      logEl.value = current ? current + '\n' + newLine : newLine;
       sessionStorage.setItem(KEY, logEl.value);
 
       // reset inputs
