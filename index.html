@@ -702,8 +702,9 @@
     }
 
     function onParamInput(key) {
+      const { min, max } = PARAM_META[key];
       const val = parseInt(document.getElementById(`val-${key}`).value);
-      if (!isNaN(val)) { cfg[key] = val; saveTimerCfg(); }
+      if (!isNaN(val)) { cfg[key] = Math.min(max, Math.max(min, val)); saveTimerCfg(); }
     }
 
     function clampParam(key) {
@@ -720,7 +721,9 @@
     let tInterval = null;
 
     function timerStart() {
+      if (tInterval) return;
       saveTimerCfg();
+      unlockAudio(); // iOS: stiller Buffer entsperrt den Audio-Stack im User-Gesture
       tState = { phase: 'prep', timeLeft: PREP_SECS, workIdx: 1, setIdx: 1, paused: false };
       document.getElementById('timer-config').hidden = true;
       document.getElementById('timer-display').hidden = false;
@@ -760,7 +763,7 @@
           releaseWakeLock();
           playFinish();
           updateTimerDisplay();
-          setTimeout(timerReset, 2500);
+          setTimeout(() => { if (tState?.phase === 'done') timerReset(); }, 2500);
           return;
         } else if (lastWork) {
           tState.phase = 'set-pause';
@@ -865,6 +868,17 @@
       if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
       if (audioCtx.state === 'suspended') audioCtx.resume();
       return audioCtx;
+    }
+
+    function unlockAudio() {
+      try {
+        const ctx = getAudioCtx();
+        const buf = ctx.createBuffer(1, 1, 22050);
+        const src = ctx.createBufferSource();
+        src.buffer = buf;
+        src.connect(ctx.destination);
+        src.start(0);
+      } catch (_) {}
     }
 
     function playBeep(freq, dur) {
