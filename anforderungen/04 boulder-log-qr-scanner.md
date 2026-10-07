@@ -117,7 +117,7 @@ Die Seite ist von oben nach unten gegliedert:
 -   [x] Tap auf das QR-Scanner-Symbol startet die Kameraansicht
 -   [x] Browserprüfung auf `BarcodeDetector` + `qr_code`-Unterstützung erfolgt vor Kamerastart; ohne Support wird ein Hinweis angezeigt
 -   [x] QR-Code im BETA7-URL-Format (`https://beta7.app/route/{routeId}/`) wird korrekt erkannt und die Route per ID abgerufen
--   [x] QR-Code mit reiner Wandnummer (Integer) ruft die neueste aktive Route an dieser Position ab
+-   [x] QR-Code mit reiner Wandnummer (Integer) schlägt die Route über `locations/{locationId}.qrcodes[nummer]` nach und ruft sie direkt ab
 -   [x] Unterhalb des App-Headers wird die gewählte Halle (Name + Ort) angezeigt; ein Klick öffnet die Hallensuche als eigene Seite
 -   [x] Ohne gewählte Halle erscheint „Keine Halle gewählt" als anklickbarer Link zur Hallensuche
 -   [x] Hallensuche-Seite enthält Suchfeld, Trefferliste und „Aktualisieren"-Button

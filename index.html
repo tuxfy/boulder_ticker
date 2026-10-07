@@ -718,7 +718,7 @@
   <div id="scanner-overlay" hidden>
     <video id="scanner-video" autoplay muted playsinline></video>
     <p class="scanner-overlay-hint">QR-Code in die Kamera halten …</p>
-    <button class="btn-scan-abort" onclick="scanAbort()">Abbrechen</button>
+    <button class="btn-scan-abort" onclick="scanStop()">Abbrechen</button>
   </div>
 
   <script>/* jsQR 1.4.0 — inline, MIT license */
@@ -10660,7 +10660,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
         document.getElementById(id).hidden = id !== active;
       });
       if (active === 'screen-boulderlog') gymUpdateBar();
-      if (active === 'screen-gym')        onGymScreenOpen();
+      if (active === 'screen-gym')        onGymScreenOpen().catch(() => {});
     }
 
     window.addEventListener('hashchange', render);
@@ -11276,7 +11276,6 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
       document.getElementById('scanner-overlay').hidden = true;
     }
 
-    function scanAbort() { scanStop(); }
 
     function scanShowMsg(msg) {
       const el = document.getElementById('scan-status');
