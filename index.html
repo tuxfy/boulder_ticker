@@ -10707,12 +10707,23 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     function copyLog() {
       const text = logEl.value.trim();
       if (!text) return;
-      navigator.clipboard.writeText(text).then(() => {
+      const markCopied = () => {
         const btn = document.getElementById('copyBtn');
         btn.textContent = 'Kopiert ✓';
         btn.classList.add('copied');
         setTimeout(() => { btn.textContent = 'Kopieren'; btn.classList.remove('copied'); }, 2000);
-      });
+      };
+      if (navigator.clipboard?.writeText) {
+        navigator.clipboard.writeText(text).then(markCopied).catch(() => copyFallback(text, markCopied));
+      } else {
+        copyFallback(text, markCopied);
+      }
+    }
+
+    function copyFallback(text, onSuccess) {
+      logEl.select();
+      logEl.setSelectionRange(0, 99999);
+      try { if (document.execCommand('copy')) onSuccess(); } catch(_) {}
     }
 
     function resetLog() {
