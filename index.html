@@ -411,6 +411,100 @@
     #timer-content.phase-work     { background: #2d0f0f; }
     #timer-content.phase-rest     { background: #0f2d1a; }
     #timer-content.phase-set-pause { background: #0f2d1a; }
+
+    /* ── GYM BAR ── */
+    .gym-bar {
+      padding: 0.4rem 1rem;
+      border-bottom: 1px solid #1e1e1e;
+      background: #111;
+      display: flex; justify-content: center;
+    }
+    .gym-bar-link {
+      background: none; border: none; padding: 0;
+      cursor: pointer; display: inline-flex; align-items: baseline;
+      gap: 0.35rem; font-size: 0.82rem; line-height: 1.4;
+      -webkit-tap-highlight-color: transparent; text-align: center;
+    }
+    .gym-bar-link:active { opacity: 0.7; }
+    .gym-name     { color: #e0e0e0; font-weight: 600; }
+    .gym-location { color: #666; }
+    .gym-bar-link .gym-none { color: #555; text-decoration: underline; text-underline-offset: 2px; }
+
+    /* ── SCANNER TRIGGER ── */
+    .scanner-trigger {
+      display: flex; flex-direction: column; align-items: center;
+      padding: 0.75rem 0 0.25rem;
+    }
+    .btn-scan-qr {
+      background: none; border: none; cursor: pointer; color: #444;
+      display: flex; flex-direction: column; align-items: center; gap: 0.3rem;
+      -webkit-tap-highlight-color: transparent; transition: color 0.15s;
+    }
+    .btn-scan-qr:active { color: #888; }
+    .btn-scan-qr span { font-size: 0.72rem; letter-spacing: 0.06em; text-transform: uppercase; }
+    .scan-status-msg {
+      font-size: 0.82rem; color: transparent; text-align: center;
+      min-height: 1.1em; margin: 0.5rem 1rem 0.75rem; padding: 0;
+      transition: color 0.15s;
+    }
+    .scan-status-msg:not(:empty) {
+      color: #f87171;
+      border: 1px solid #7f1d1d;
+      border-radius: 6px;
+      background: #1f0606;
+      padding: 0.45rem 0.75rem;
+    }
+
+    /* ── SCANNER OVERLAY ── */
+    #scanner-overlay {
+      position: fixed; inset: 0; z-index: 100;
+      background: #000; display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+    }
+    #scanner-video {
+      width: 100%; max-width: 480px; border-radius: 12px;
+    }
+    .scanner-overlay-hint {
+      color: #666; font-size: 0.85rem; margin-top: 0.75rem;
+      text-align: center; padding: 0 1rem;
+    }
+    .btn-scan-abort {
+      position: absolute; bottom: 2.5rem;
+      left: 50%; transform: translateX(-50%);
+      background: #1e1e1e; border: 1px solid #2a2a2a; border-radius: 12px;
+      color: #e0e0e0; font-size: 1rem; font-weight: 600;
+      padding: 0.875rem 2.5rem; cursor: pointer; white-space: nowrap;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .btn-scan-abort:active { background: #272727; }
+
+    /* ── GYM SCREEN ── */
+    .gym-search-row { display: flex; gap: 0.5rem; margin-bottom: 0.5rem; }
+    .gym-search-row input {
+      flex: 1; background: #1e1e1e; border: 1px solid #2a2a2a;
+      border-radius: 8px; color: #fff; font-size: 1rem;
+      padding: 0 0.75rem; height: 44px; -webkit-appearance: none;
+    }
+    .gym-search-row input:focus { outline: none; border-color: #3a7bd5; }
+    .btn-gym-refresh {
+      height: 44px; background: #1e1e1e; border: 1px solid #2a2a2a;
+      border-radius: 8px; color: #aaa; font-size: 0.85rem; font-weight: 600;
+      padding: 0 0.875rem; cursor: pointer; white-space: nowrap;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .btn-gym-refresh:active { background: #272727; }
+    .btn-gym-refresh:disabled { opacity: 0.4; }
+    .gym-status-line { color: #666; font-size: 0.85rem; padding: 0.5rem 0; min-height: 1.4em; }
+    .gym-list { list-style: none; }
+    .gym-item {
+      padding: 0.7rem 0; border-bottom: 1px solid #1e1e1e;
+      cursor: pointer; -webkit-tap-highlight-color: transparent;
+    }
+    .gym-item:active { opacity: 0.7; }
+    .gym-item-name { font-size: 0.95rem; color: #e0e0e0; font-weight: 600; }
+    .gym-item-name.is-selected { color: #3a7bd5; }
+    .gym-item-addr { font-size: 0.78rem; color: #666; margin-top: 0.1rem; }
+    .gym-no-results { color: #555; font-size: 0.9rem; padding: 1rem 0; }
   </style>
 </head>
 <body>
@@ -454,7 +548,32 @@
       <h1>Boulder Log</h1>
       <button class="btn-tools" onclick="navigate('')">⊞ Tools</button>
     </header>
+    <div class="gym-bar">
+      <button class="gym-bar-link" onclick="navigate('gym')" id="gym-bar-btn">
+        <span id="gym-bar-text" class="gym-none">Keine Halle gewählt</span>
+      </button>
+    </div>
     <div class="tool-content">
+
+      <div class="scanner-trigger">
+        <button class="btn-scan-qr" onclick="scanStart()" aria-label="QR-Code scannen">
+          <svg width="44" height="44" viewBox="0 0 44 44" fill="none" aria-hidden="true">
+            <rect x="3" y="3" width="14" height="14" rx="2" stroke="#444" stroke-width="2" fill="none"/>
+            <rect x="7" y="7" width="6" height="6" fill="#444"/>
+            <rect x="27" y="3" width="14" height="14" rx="2" stroke="#444" stroke-width="2" fill="none"/>
+            <rect x="31" y="7" width="6" height="6" fill="#444"/>
+            <rect x="3" y="27" width="14" height="14" rx="2" stroke="#444" stroke-width="2" fill="none"/>
+            <rect x="7" y="31" width="6" height="6" fill="#444"/>
+            <rect x="27" y="27" width="4" height="4" fill="#444"/>
+            <rect x="33" y="27" width="4" height="4" fill="#444"/>
+            <rect x="27" y="33" width="4" height="4" fill="#444"/>
+            <rect x="33" y="33" width="4" height="4" fill="#444"/>
+            <rect x="30" y="30" width="4" height="4" fill="#444"/>
+          </svg>
+          <span>Scan QR</span>
+        </button>
+      </div>
+      <p id="scan-status" class="scan-status-msg"></p>
 
       <div class="input-grid">
         <input type="text" id="grade" list="grade-list" placeholder="Grad" autocomplete="off">
@@ -579,12 +698,36 @@
     </div>
   </div>
 
+  <!-- GYM SELECTION -->
+  <div id="screen-gym" class="tool-screen" hidden>
+    <header class="tool-header">
+      <h1>Halle wählen</h1>
+      <button class="btn-tools" onclick="navigate('boulderlog')">← Zurück</button>
+    </header>
+    <div class="tool-content">
+      <div class="gym-search-row">
+        <input type="text" id="gym-search" placeholder="Halle suchen …" autocomplete="off" oninput="gymRenderList()">
+        <button class="btn-gym-refresh" id="btn-gym-refresh" onclick="gymRefresh()">Aktualisieren</button>
+      </div>
+      <p class="gym-status-line" id="gym-status"></p>
+      <ul class="gym-list" id="gym-list"></ul>
+    </div>
+  </div>
+
+  <!-- SCANNER OVERLAY -->
+  <div id="scanner-overlay" hidden>
+    <video id="scanner-video" autoplay muted playsinline></video>
+    <p class="scanner-overlay-hint">QR-Code in die Kamera halten …</p>
+    <button class="btn-scan-abort" onclick="scanAbort()">Abbrechen</button>
+  </div>
+
   <script>
     // ── ROUTING ──────────────────────────────────────────────────
     const SCREENS = {
       '':           'screen-home',
       'boulderlog': 'screen-boulderlog',
       'timer':      'screen-timer',
+      'gym':        'screen-gym',
     };
 
     function navigate(tool) {
@@ -597,6 +740,8 @@
       Object.values(SCREENS).forEach(id => {
         document.getElementById(id).hidden = id !== active;
       });
+      if (active === 'screen-boulderlog') gymUpdateBar();
+      if (active === 'screen-gym')        onGymScreenOpen();
     }
 
     window.addEventListener('hashchange', render);
@@ -920,6 +1065,338 @@
         requestWakeLock();
       }
     });
+
+    // ── GYM / HALL ────────────────────────────────────────────────
+    const LS_GYM_CACHE  = 'beta7_gyms';
+    const LS_GYM_SEL    = 'beta7_gym_sel';
+    const GYM_CACHE_TTL = 7 * 24 * 3600 * 1000;
+    const FSBASE        = 'https://firestore.googleapis.com/v1/projects/beta7-206508/databases/(default)/documents';
+
+    let gymCache   = null;
+    let gymResults = [];
+
+    function gymGetSel() {
+      try { return JSON.parse(localStorage.getItem(LS_GYM_SEL)); } catch(_) { return null; }
+    }
+
+    function escHtml(s) {
+      return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    }
+
+    function gymUpdateBar() {
+      const sel = gymGetSel();
+      const el  = document.getElementById('gym-bar-text');
+      if (!el) return;
+      if (sel) {
+        el.className = '';
+        el.innerHTML = `<span class="gym-name">${escHtml(sel.label)}</span>`
+          + (sel.city ? ` <span class="gym-location">· ${escHtml(sel.city)}</span>` : '');
+      } else {
+        el.className = 'gym-none';
+        el.textContent = 'Keine Halle gewählt';
+      }
+    }
+
+    function unpackValue(v) {
+      if (!v) return null;
+      if ('stringValue'  in v) return v.stringValue;
+      if ('integerValue' in v) return parseInt(v.integerValue);
+      if ('doubleValue'  in v) return v.doubleValue;
+      if ('booleanValue' in v) return v.booleanValue;
+      if ('arrayValue'   in v) return (v.arrayValue.values || []).map(unpackValue);
+      if ('mapValue'     in v) return unpackFields(v.mapValue.fields || {});
+      return null;
+    }
+
+    function unpackFields(fields) {
+      const out = {};
+      for (const [k, v] of Object.entries(fields)) out[k] = unpackValue(v);
+      return out;
+    }
+
+    function normalizeStr(s) {
+      return (s || '')
+        .normalize('NFKD')
+        .replace(/[̀-ͯ]/g, '')
+        .replace(/[^\w\s]/g, ' ')
+        .toLowerCase()
+        .replace(/\s+/g, ' ')
+        .trim();
+    }
+
+    function gymCacheLoad() {
+      try {
+        const raw = JSON.parse(localStorage.getItem(LS_GYM_CACHE));
+        if (raw && Date.now() - raw.ts < GYM_CACHE_TTL) { gymCache = raw.data; return true; }
+      } catch(_) {}
+      return false;
+    }
+
+    async function gymFetch() {
+      const gyms = [];
+      let pageToken = null;
+      const MASK = 'mask.fieldPaths=displayName&mask.fieldPaths=locationName&mask.fieldPaths=address&mask.fieldPaths=status';
+      do {
+        const base = `${FSBASE}/locations?pageSize=300&${MASK}`;
+        const urlStr = pageToken ? `${base}&pageToken=${encodeURIComponent(pageToken)}` : base;
+        const res = await fetch(urlStr);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const json = await res.json();
+        for (const doc of (json.documents || [])) {
+          const f = unpackFields(doc.fields || {});
+          if (f.status && f.status !== 'public') continue;
+          const locationId = doc.name.split('/').pop();
+          const labelRaw = f.displayName || f.locationName;
+          const label = typeof labelRaw === 'string' ? labelRaw
+                      : (labelRaw && typeof labelRaw === 'object')
+                        ? String(labelRaw.en || labelRaw.de || Object.values(labelRaw)[0] || locationId)
+                        : locationId;
+          let city = '';
+          if (typeof f.address === 'string') city = f.address;
+          else if (f.address && typeof f.address === 'object')
+            city = String(f.address.city_name || f.address.city || f.address.locality || '');
+          gyms.push({ locationId, label, city, normKey: normalizeStr(label + ' ' + city) });
+        }
+        pageToken = json.nextPageToken || null;
+      } while (pageToken);
+      gyms.sort((a, b) => a.label.localeCompare(b.label));
+      gymCache = gyms;
+      localStorage.setItem(LS_GYM_CACHE, JSON.stringify({ ts: Date.now(), data: gyms }));
+    }
+
+    function gymSearch(q) {
+      if (!gymCache) return [];
+      const sel = gymGetSel();
+      if (!q.trim()) {
+        const list = gymCache.slice();
+        if (sel) {
+          const idx = list.findIndex(g => g.locationId === sel.locationId);
+          if (idx > 0) list.unshift(list.splice(idx, 1)[0]);
+        }
+        return list.slice(0, 20);
+      }
+      const tokens = normalizeStr(q).split(' ').filter(Boolean);
+      const nq     = normalizeStr(q);
+      const hits   = gymCache.filter(g => {
+        const key = typeof g.normKey === 'string' ? g.normKey
+                  : normalizeStr((g.label || '') + ' ' + (g.city || ''));
+        return tokens.every(t => key.includes(t));
+      });
+      hits.sort((a, b) => {
+        const rank = g => {
+          const n = normalizeStr(g.label);
+          if (n === nq) return 0;
+          if (n.startsWith(nq)) return 1;
+          if (tokens.some(t => n.startsWith(t))) return 2;
+          return 3;
+        };
+        return rank(a) - rank(b) || a.label.localeCompare(b.label);
+      });
+      return hits.slice(0, 20);
+    }
+
+    function gymRenderList() {
+      const q        = document.getElementById('gym-search').value;
+      const statusEl = document.getElementById('gym-status');
+      const listEl   = document.getElementById('gym-list');
+      const sel      = gymGetSel();
+
+      if (!gymCache) {
+        statusEl.textContent = 'Hallenliste nicht verfügbar — bitte einmal online öffnen.';
+        listEl.innerHTML = '';
+        return;
+      }
+      statusEl.textContent = '';
+      gymResults = gymSearch(q);
+      if (!gymResults.length) {
+        listEl.innerHTML = '<li class="gym-no-results">Keine Treffer.</li>';
+        return;
+      }
+      listEl.innerHTML = gymResults.map((g, i) =>
+        `<li class="gym-item" onclick="gymSelect(${i})">` +
+        `<div class="gym-item-name${sel && sel.locationId === g.locationId ? ' is-selected' : ''}">${escHtml(g.label)}</div>` +
+        (g.city ? `<div class="gym-item-addr">${escHtml(g.city)}</div>` : '') +
+        `</li>`
+      ).join('');
+    }
+
+    function gymSelect(i) {
+      const g = gymResults[i];
+      localStorage.setItem(LS_GYM_SEL, JSON.stringify(g));
+      gymUpdateBar();
+      navigate('boulderlog');
+    }
+
+    async function gymRefresh() {
+      const btn      = document.getElementById('btn-gym-refresh');
+      const statusEl = document.getElementById('gym-status');
+      btn.textContent = '…';
+      btn.disabled    = true;
+      statusEl.textContent = 'Lädt …';
+      try {
+        gymCache = null;
+        await gymFetch();
+        statusEl.textContent = '';
+        gymRenderList();
+      } catch(e) {
+        statusEl.textContent = 'Hallenliste konnte nicht geladen werden — bitte erneut versuchen.';
+        console.error('[gymFetch]', e);
+      } finally {
+        btn.textContent = 'Aktualisieren';
+        btn.disabled    = false;
+      }
+    }
+
+    async function onGymScreenOpen() {
+      document.getElementById('gym-search').value = '';
+      if (!gymCache && !gymCacheLoad()) {
+        const statusEl = document.getElementById('gym-status');
+        statusEl.textContent = 'Lädt …';
+        try {
+          await gymFetch();
+          statusEl.textContent = '';
+        } catch(_) {
+          statusEl.textContent = 'Hallenliste nicht verfügbar — bitte einmal online öffnen.';
+          return;
+        }
+      }
+      gymRenderList();
+    }
+
+    // ── QR SCANNER ────────────────────────────────────────────────
+    let scanStream = null;
+
+    async function scanStart() {
+      if (scanStream) return;
+      if (!('BarcodeDetector' in window)) {
+        scanShowMsg('QR-Scanner wird von diesem Browser nicht unterstützt (Chrome empfohlen).');
+        return;
+      }
+      let supported;
+      try { supported = await BarcodeDetector.getSupportedFormats(); } catch(_) { supported = []; }
+      if (!supported.includes('qr_code')) {
+        scanShowMsg('QR-Scanner wird von diesem Browser nicht unterstützt (Chrome empfohlen).');
+        return;
+      }
+      try {
+        scanStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+      } catch(_) {
+        scanShowMsg('Kamerazugriff nicht möglich.');
+        return;
+      }
+      const video = document.getElementById('scanner-video');
+      video.srcObject = scanStream;
+      await video.play();
+      document.getElementById('scanner-overlay').hidden = false;
+      scanShowMsg('');
+
+      const detector = new BarcodeDetector({ formats: ['qr_code'] });
+      let busy = false;
+      function frame() {
+        if (!scanStream) return;
+        if (busy) { requestAnimationFrame(frame); return; }
+        busy = true;
+        detector.detect(video).then(codes => {
+          if (codes.length > 0) {
+            const raw = codes[0].rawValue;
+            scanStop();
+            handleScanResult(raw);
+          } else {
+            busy = false;
+            requestAnimationFrame(frame);
+          }
+        }).catch(() => { busy = false; requestAnimationFrame(frame); });
+      }
+      requestAnimationFrame(frame);
+    }
+
+    function scanStop() {
+      if (scanStream) { scanStream.getTracks().forEach(t => t.stop()); scanStream = null; }
+      document.getElementById('scanner-overlay').hidden = true;
+    }
+
+    function scanAbort() { scanStop(); }
+
+    function scanShowMsg(msg) {
+      const el = document.getElementById('scan-status');
+      if (el) el.textContent = msg;
+    }
+
+    // ── FIRESTORE ROUTE FETCH ─────────────────────────────────────
+    async function fetchRouteById(routeId) {
+      const res = await fetch(`${FSBASE}/routes/${encodeURIComponent(routeId)}`);
+      if (res.status === 404) return null;
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const json = await res.json();
+      return unpackFields(json.fields || {});
+    }
+
+    async function fetchRouteByQrcode(qrNum, locationId) {
+      const res = await fetch(`${FSBASE}:runQuery`, {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          structuredQuery: {
+            from:  [{ collectionId: 'routes' }],
+            where: { fieldFilter: {
+              field: { fieldPath: 'qrcode' },
+              op:    'EQUAL',
+              value: { integerValue: String(qrNum) }
+            }},
+            limit: 50
+          }
+        })
+      });
+      const rows = await res.json();
+      let routes = rows
+        .filter(r => r.document)
+        .map(r => unpackFields(r.document.fields || {}))
+        .filter(r => r.status === 'active');
+      if (locationId) {
+        const byLoc = routes.filter(r => r.locationId === locationId);
+        if (byLoc.length) routes = byLoc;
+      }
+      if (!routes.length) return null;
+      routes.sort((a, b) => (b.time || 0) - (a.time || 0));
+      return routes[0];
+    }
+
+    async function handleScanResult(raw) {
+      const urlMatch = raw.match(/https?:\/\/beta7\.app\/route\/([^/?#\s]+)/);
+      const isRawId  = !urlMatch && /^[A-Za-z0-9_-]+~\d+$/.test(raw.trim());
+      const isNum    = !urlMatch && !isRawId && /^\d+$/.test(raw.trim());
+
+      if (urlMatch || isRawId) {
+        const routeId = urlMatch ? urlMatch[1] : raw.trim();
+        scanShowMsg('Lade Route …');
+        let route;
+        try { route = await fetchRouteById(routeId); }
+        catch(_) { scanShowMsg('Abruf fehlgeschlagen — bitte erneut versuchen.'); return; }
+        if (!route) { scanShowMsg('Route nicht gefunden.'); return; }
+        applyRouteToForm(route);
+
+      } else if (isNum) {
+        const sel = gymGetSel();
+        if (!sel) { scanShowMsg('Keine Halle gewählt — bitte zuerst eine Halle auswählen.'); return; }
+        scanShowMsg('Lade Route …');
+        let route;
+        try { route = await fetchRouteByQrcode(parseInt(raw.trim()), sel.locationId); }
+        catch(_) { scanShowMsg('Abruf fehlgeschlagen — bitte erneut versuchen.'); return; }
+        if (!route) { scanShowMsg('Keine aktive Route an dieser Position.'); return; }
+        applyRouteToForm(route);
+
+      } else {
+        scanShowMsg(`Inhalt kann nicht verarbeitet werden: ${raw}`);
+      }
+    }
+
+    function applyRouteToForm(route) {
+      const grade  = route.grades && route.grades.label ? route.grades.label : '';
+      const styles = Array.isArray(route.routeStyles) ? route.routeStyles.join(', ') : '';
+      gradeEl.value = grade;
+      if (styles) styleEl.value = styles;
+      scanShowMsg('');
+    }
   </script>
 
 </body>
