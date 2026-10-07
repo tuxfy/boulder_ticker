@@ -11293,42 +11293,24 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
     }
 
     async function fetchRouteByQrcode(qrNum, locationId) {
-      const res = await fetch(`${FSBASE}:runQuery`, {
-        method:  'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          structuredQuery: {
-            from:  [{ collectionId: 'routes' }],
-            where: { fieldFilter: {
-              field: { fieldPath: 'qrcode' },
-              op:    'EQUAL',
-              value: { integerValue: String(qrNum) }
-            }},
-            limit: 50
-          }
-        })
-      });
-      const rows = await res.json();
-      let routes = rows
-        .filter(r => r.document)
-        .map(r => unpackFields(r.document.fields || {}))
-        .filter(r => r.status === 'active');
-      if (locationId) {
-        const byLoc = routes.filter(r => r.locationId === locationId);
-        if (byLoc.length) routes = byLoc;
-      }
-      if (!routes.length) return null;
-      routes.sort((a, b) => (b.time || 0) - (a.time || 0));
-      return routes[0];
+      const locRes = await fetch(`${FSBASE}/locations/${encodeURIComponent(locationId)}?mask.fieldPaths=qrcodes`);
+      if (!locRes.ok) throw new Error(`HTTP ${locRes.status}`);
+      const locDoc = await locRes.json();
+      const f = unpackFields(locDoc.fields || {});
+      const routeId = f.qrcodes && f.qrcodes[String(qrNum)];
+      if (!routeId) return null;
+      return fetchRouteById(routeId);
     }
 
     async function handleScanResult(raw) {
-      const urlMatch = raw.match(/https?:\/\/beta7\.app\/route\/([^/?#\s]+)/);
-      const isRawId  = !urlMatch && /^[A-Za-z0-9_-]+~\d+$/.test(raw.trim());
-      const isNum    = !urlMatch && !isRawId && /^\d+$/.test(raw.trim());
+      const s             = raw.trim().replace(/\/+$/, '');
+      const urlRouteMatch = s.match(/https?:\/\/beta7\.app\/route\/([^/?#\s]+)/);
+      const urlQrMatch    = !urlRouteMatch && s.match(/https?:\/\/beta7\.app\/[^/?#\s]+\/(\d+)$/);
+      const isRawId       = !urlRouteMatch && !urlQrMatch && /^[A-Za-z0-9_-]+~\d+$/.test(s);
+      const isNum         = !urlRouteMatch && !urlQrMatch && !isRawId && /^\d+$/.test(s);
 
-      if (urlMatch || isRawId) {
-        const routeId = urlMatch ? urlMatch[1] : raw.trim();
+      if (urlRouteMatch || isRawId) {
+        const routeId = urlRouteMatch ? urlRouteMatch[1] : s;
         scanShowMsg('Lade Route …');
         let route;
         try { route = await fetchRouteById(routeId); }
@@ -11336,12 +11318,13 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
         if (!route) { scanShowMsg('Route nicht gefunden.'); return; }
         applyRouteToForm(route);
 
-      } else if (isNum) {
+      } else if (urlQrMatch || isNum) {
+        const qrNum = parseInt(urlQrMatch ? urlQrMatch[1] : s);
         const sel = gymGetSel();
         if (!sel) { scanShowMsg('Keine Halle gewählt — bitte zuerst eine Halle auswählen.'); return; }
         scanShowMsg('Lade Route …');
         let route;
-        try { route = await fetchRouteByQrcode(parseInt(raw.trim()), sel.locationId); }
+        try { route = await fetchRouteByQrcode(qrNum, sel.locationId); }
         catch(_) { scanShowMsg('Abruf fehlgeschlagen — bitte erneut versuchen.'); return; }
         if (!route) { scanShowMsg('Keine aktive Route an dieser Position.'); return; }
         applyRouteToForm(route);

@@ -15,14 +15,15 @@ BETA7 ist eine Kletterrouten-Plattform, die in teilnehmenden Hallen QR-Codes an 
 
 **Routing-IDs:** `{routesetterUid}~{timestampMs}`
 
-**Zwei QR-Code-Varianten:**
+**Drei QR-Code-Varianten:**
 
 | Variante | Inhalt | Abfrage |
 |----------|--------|---------|
-| A | Volle URL oder Route-ID | `GET /documents/routes/{routeId}` |
-| B | Nur Wandnummer (`qrcode`-Wert) | `POST /documents:runQuery` mit `structuredQuery` |
+| A | `https://beta7.app/route/{routeId}` oder rohe Route-ID | `GET /routes/{routeId}` |
+| B | Reine Ganzzahl (Wandpositionsnummer) | `GET /locations/{locationId}` → `qrcodes[nummer]` → `GET /routes/{routeId}` |
+| B-URL | `https://beta7.app/{slug}/{nummer}` | wie Variante B — Slug wird ignoriert, letzte Zahl ist die Wandpositionsnummer |
 
-Bei Variante B ist die Wandnummer nicht eindeutig (mehrere Routen pro Position möglich — beim Umschrauben); clientseitig wird auf `status == "active"` gefiltert und die neueste Route (`time` größter Wert) gewählt. Sind mehrere `locationId`-Werte vertreten, wird die aktive Halle des Nutzers als Filter verwendet.
+Bei Variante B wird die Wandpositionsnummer als Schlüssel in der `qrcodes`-Map des gewählten Locations-Dokuments nachgeschlagen. Das Ergebnis ist die `routeId`, die direkt per GET abgerufen wird. Die gewählte Halle liefert die `locationId` — ohne Slug-Auflösung.
 
 **Firestore-Endpunkt:** `https://firestore.googleapis.com/v1/projects/beta7-206508/databases/(default)/documents`
 
