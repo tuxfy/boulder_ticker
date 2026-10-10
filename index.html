@@ -10685,8 +10685,8 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
 
     [gradeEl, styleEl].forEach(el => el.addEventListener('focus', () => el.select()));
 
-    logEl.value = sessionStorage.getItem(KEY) || '';
-    logEl.addEventListener('input', () => sessionStorage.setItem(KEY, logEl.value));
+    logEl.value = localStorage.getItem(KEY) || '';
+    logEl.addEventListener('input', () => localStorage.setItem(KEY, logEl.value));
 
     function buildLine(grade, t, send, style) {
       return `- ${grade}: ${t} ${t === 1 ? 'try' : 'tries'}${send ? ' (send)' : ''}${style ? ` - ${style}` : ''}`;
@@ -10697,7 +10697,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
       if (!grade) { gradeEl.focus(); return; }
       const line = buildLine(grade, tries, sendBtn.classList.contains('active'), styleEl.value.trim());
       logEl.value = logEl.value ? logEl.value + '\n' + line : line;
-      sessionStorage.setItem(KEY, logEl.value);
+      localStorage.setItem(KEY, logEl.value);
       tries = 1; triesVal.textContent = 1;
       sendBtn.classList.remove('active');
       styleEl.value = '';
@@ -10730,7 +10730,7 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
       if (!logEl.value.trim()) return;
       if (confirm('Alle Einträge löschen?')) {
         logEl.value = '';
-        sessionStorage.removeItem(KEY);
+        localStorage.removeItem(KEY);
       }
     }
 
