@@ -1,5 +1,5 @@
 -   **Title** Refactor — Architektur von index.html
--   **Status** new
+-   **Status** done
 
 # Anforderung
 
@@ -69,22 +69,27 @@ src/
 # Risiken & Hinweise
 
 1. **Inline-`onclick` vs. Modul-Scope (größter Aufwandstreiber):** Die App bindet Events durchgängig über Inline-Handler im HTML (`onclick="navigate('timer')"`, `onclick="timerStart()"`, `onclick="adjustParam(...)"` …), die **globale** Funktionen aufrufen. ES-Module kapseln alles lokal — dadurch würden diese Funktionen nicht mehr global sein und sämtliche Inline-Handler brechen. **Entscheidung:** Event-Anbindung wird im Zuge des Refactors auf `addEventListener` in den View-Modulen umgestellt (keine Inline-Handler mehr). Das ist der substanzielle Teil der Arbeit und die größte Regressionsquelle.
-2. **Keine automatischen Tests → Regressionsrisiko:** Verhaltensgleichheit wird manuell verifiziert. **Gegenmittel:** inkrementell migrieren (erst CSS + jsQR auslagern, dann View für View) und nach jedem Schritt per `npx serve` testen — nicht alles auf einmal.
+2. **Regressionsrisiko — abgesichert durch die E2E-Suite:** Seit [[09 e2e-tests]] decken E2E-Tests Navigation, Timer, Boulder-Log, localStorage und Gym ab; die CI ([[10 ci-cd-deploy-gating]]) blockiert bei rot ohnehin den Deploy. **Gegenmittel:** inkrementell migrieren (erst CSS + jsQR auslagern, dann View für View) und nach **jedem** Schritt `npm test` grün halten — nicht alles auf einmal.
 3. **Service-Worker als Fußangel:** Statt nur `index.html` müssen künftig alle Dateien gecacht werden; ein vergessener Eintrag bricht den Offline-Start. Zusätzlich gab es bereits Probleme mit veraltetem Cache (alte Version trotz Änderung). **Entscheidung:** SW mit sauberem **Cache-Versioning** (versionierter Cache-Name, alte Caches beim Aktivieren löschen) aufsetzen.
 4. **Kein `file://` mehr:** ES-Module benötigen HTTP (CORS). Die App lässt sich dann nicht mehr per Doppelklick aus dem Dateisystem öffnen, nur noch über Server (`npx serve`) oder als installierte PWA. Ändert die Aussage aus [[07 pwa]] „läuft als statische Datei ohne Server".
 5. **jsQR ist eine Global-/UMD-Bibliothek:** Für sauberes Lazy-Laden per `import()` ist ggf. ein kleiner Wrapper/Shim nötig.
 6. **Markup wandert in JS-Template-Strings:** Pro View liegt das HTML als Template im Modul (kostet etwas HTML-Komfort; hängt mit Punkt 1 zusammen, da Handler per Code statt inline gebunden werden).
+7. **E2E-Tests fixieren Verträge, die der Refactor einhalten muss:** Die Tests hängen an konkreten DOM-IDs/Selektoren (`#grade`, `.btn-add`, `#val-work`, `#timer-phase`, `#gym-list .gym-item`, `#gym-bar-text` …), Button-Namen („Start", „Boulder Log", „Timer", „Tools"), Hash-Routen (`#/boulderlog`, `#/timer`, `#/gym`), localStorage-Keys (`boulder_log`, `timer_cfg`, `beta7_gym_sel`, `beta7_gyms`) und Phasen-Texten („Vorbereitung", „Work", „Rest"). Diese Verträge werden **beibehalten** (oder die Tests bewusst mitgezogen). Positiv: Verletzungen werden sofort rot.
+8. **Scanner & Audio sind nicht E2E-abgedeckt:** Genau diese Module (`scanner.js`, `audio.js`) werden umgebaut, haben aber kein automatisches Netz (Kamera/`AudioContext`). → höheres Regressionsrisiko, **manuelle Verifikation** erforderlich.
 
 # Akzeptanzkriterien
 
--   [ ] Struktur entspricht der dokumentierten Zielarchitektur (Feature-Ordner, buildfrei, ES-Module)
--   [ ] HTML, CSS und JavaScript sind klar getrennt (keine Vermischung in einer Datei)
--   [ ] Jede Ansicht liegt in einem eigenen Feature-Ordner (Logik + Styles beieinander)
--   [ ] jsQR ist aus `index.html` ausgelagert
--   [ ] `index.html` ist auf eine schlanke App-Hülle reduziert
--   [ ] Keine Inline-Event-Handler mehr — Events werden per `addEventListener` gebunden
--   [ ] Service-Worker nutzt versioniertes Caching (alte Caches werden beim Aktivieren entfernt)
--   [ ] Alle bestehenden Funktionen verhalten sich unverändert (keine Regression)
--   [ ] App bleibt installierbare PWA und startet weiterhin offline
--   [ ] Lokaler Test durch den Nutzer per `npx serve` erfolgreich
--   [ ] `README.md` wird um die neue Projektstruktur ergänzt
+-   [x] Struktur entspricht der dokumentierten Zielarchitektur (Feature-Ordner, buildfrei, ES-Module)
+-   [x] HTML, CSS und JavaScript sind klar getrennt (keine Vermischung in einer Datei)
+-   [x] Jede Ansicht liegt in einem eigenen Feature-Ordner (Logik + Styles beieinander)
+-   [x] jsQR ist aus `index.html` ausgelagert
+-   [x] `index.html` ist auf eine schlanke App-Hülle reduziert (11.356 → 44 Zeilen)
+-   [x] Keine Inline-Event-Handler mehr — Events werden per `addEventListener` gebunden
+-   [x] Service-Worker nutzt versioniertes Caching (alte Caches werden beim Aktivieren entfernt)
+-   [x] Alle bestehenden Funktionen verhalten sich unverändert (keine Regression) — E2E-abgedeckte Teile bestätigt; Scanner/Audio siehe unten
+-   [x] App bleibt installierbare PWA und startet weiterhin offline
+-   [x] E2E-Tests (`npm test`) laufen nach dem Refactor unverändert grün
+-   [x] CI/CD-Pipeline bleibt grün (Deploy-Gate erfüllt)
+-   [x] Scanner und Audio manuell verifiziert (nicht E2E-abgedeckt)
+-   [x] Lokaler Test durch den Nutzer per `npx serve` erfolgreich (nach jedem Schritt)
+-   [x] `README.md` wird um die neue Projektstruktur ergänzt

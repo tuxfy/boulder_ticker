@@ -1,0 +1,23 @@
+/* Scanner-Overlay */
+
+#scanner-overlay {
+  position: fixed; inset: 0; z-index: 100;
+  background: #000; display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+}
+#scanner-video {
+  width: 100%; max-width: 480px; border-radius: 12px;
+}
+.scanner-overlay-hint {
+  color: #666; font-size: 0.85rem; margin-top: 0.75rem;
+  text-align: center; padding: 0 1rem;
+}
+.btn-scan-abort {
+  position: absolute; bottom: 2.5rem;
+  left: 50%; transform: translateX(-50%);
+  background: #1e1e1e; border: 1px solid #2a2a2a; border-radius: 12px;
+  color: #e0e0e0; font-size: 1rem; font-weight: 600;
+  padding: 0.875rem 2.5rem; cursor: pointer; white-space: nowrap;
+  -webkit-tap-highlight-color: transparent;
+}
+.btn-scan-abort:active { background: #272727; }

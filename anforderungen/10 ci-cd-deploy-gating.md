@@ -1,5 +1,5 @@
 -   **Title** CI/CD — Deploy nur bei grünen Tests
--   **Status** in progress
+-   **Status** done
 
 # Anforderung
 
@@ -33,6 +33,6 @@ GitHub erlaubt es nicht, den eingebauten Branch-Deploy an das Ergebnis eines sep
 -   [x] Deploy erfolgt nur bei grünem Test-Job (roter Test → kein Deploy) — strukturell über `needs: test`
 -   [x] Deploy nutzt die GitHub-Actions-Pages-Aktionen (`upload-pages-artifact` + `deploy-pages`)
 -   [x] Pages-Quelle ist auf „GitHub Actions" umgestellt (manueller Repo-Schritt dokumentiert)
--   [ ] Veröffentlichte Seite entspricht dem bisherigen Stand (gesamtes Repo-Root, wie bisher) — Bestätigung nach erstem Push
--   [ ] Push auf `main` mit grünen Tests veröffentlicht die Seite; mit roten Tests nicht — Bestätigung nach erstem Push
+-   [x] Veröffentlichte Seite entspricht dem bisherigen Stand (gesamtes Repo-Root, wie bisher)
+-   [x] Push auf `main` mit grünen Tests veröffentlicht die Seite; mit roten Tests nicht — grüner Pfad bestätigt (Pipeline läuft), roter Pfad strukturell über `needs: test`
 -   [x] `README.md` wird um die CI/CD-Pipeline ergänzt

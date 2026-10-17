@@ -1,0 +1,114 @@
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      background: #111;
+      color: #e0e0e0;
+      min-height: 100dvh;
+    }
+
+    [hidden] { display: none !important; }
+
+    /* ── HOME ── */
+    #screen-home {
+      padding: 2rem 1.25rem 1.25rem;
+      max-width: 480px;
+      margin: 0 auto;
+    }
+
+    /* Home-/Menü-Styles → src/views/menu/menu.css */
+
+    /* ── TOOL SHELL ── */
+    .tool-screen {
+      display: flex;
+      flex-direction: column;
+      min-height: 100dvh;
+    }
+
+    .tool-header {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      background: #111;
+      border-bottom: 1px solid #1e1e1e;
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+      padding: 0.625rem 1rem;
+    }
+
+    .tool-header h1 {
+      justify-self: start;
+      font-size: 1rem;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .btn-tools {
+      background: #1e1e1e;
+      border: 1px solid #2a2a2a;
+      border-radius: 10px;
+      color: #ccc;
+      font-size: 0.9rem;
+      font-weight: 600;
+      padding: 0.45rem 0.875rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+      white-space: nowrap;
+      min-height: 40px;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .btn-tools:active { background: #272727; }
+
+    .tool-content {
+      padding: 1.25rem 1rem;
+      max-width: 480px;
+      margin: 0 auto;
+      width: 100%;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Boulder-Log-Styles → src/views/boulderlog/boulderlog.css */
+
+    /* .stepper: geteilt (Boulder-Log + Timer) → bleibt hier */
+    .stepper {
+      display: flex;
+      align-items: stretch;
+      height: 44px;
+      background: #1e1e1e;
+      border: 1px solid #2a2a2a;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    .stepper button {
+      background: none;
+      border: none;
+      color: #aaa;
+      font-size: 1.2rem;
+      width: 2.25rem;
+      cursor: pointer;
+      flex-shrink: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .stepper button:active { background: #2a2a2a; }
+    .stepper span {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-size: 1rem;
+      min-width: 1.75rem;
+      user-select: none;
+    }
+
+    input::placeholder, textarea::placeholder { color: #555; }
+
+    /* Timer-Styles → src/views/timer/timer.css */
+
+    /* Scanner-Overlay-Styles → src/views/scanner/scanner.css */
+    /* Gym-Screen-Styles → src/views/gym/gym.css */

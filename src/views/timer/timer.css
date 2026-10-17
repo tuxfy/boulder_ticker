@@ -1,0 +1,132 @@
+/* Timer-View */
+
+/* ── TIMER ── */
+.timer-params {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 1.5rem;
+}
+.timer-param {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid #1e1e1e;
+}
+.timer-params .timer-param:first-child { border-top: 1px solid #1e1e1e; }
+.timer-param-label { font-size: 0.95rem; color: #ccc; }
+.timer-param-right {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.timer-stepper input {
+  flex: 1;
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 1rem;
+  text-align: center;
+  min-width: 3rem;
+  width: 3rem;
+  padding: 0;
+  -webkit-appearance: none;
+  appearance: none;
+}
+.timer-stepper input:focus { outline: none; color: #fff; }
+.timer-param-unit { font-size: 0.85rem; color: #555; width: 0.75rem; }
+
+.btn-timer-start {
+  width: 100%;
+  background: #fff;
+  border: none;
+  border-radius: 12px;
+  color: #111;
+  font-size: 1.1rem;
+  font-weight: 700;
+  padding: 1rem;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.btn-timer-start:active { background: #ddd; }
+
+/* timer active display */
+#timer-display {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  padding: 2.5rem 0 1rem;
+  text-align: center;
+}
+
+.timer-phase-label {
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: #555;
+  transition: color 0.3s;
+}
+.timer-phase-label.work  { color: #e05555; }
+.timer-phase-label.rest  { color: #6bcb77; }
+
+.timer-time {
+  font-size: 6rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: #fff;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+@keyframes timerpulse {
+  0%   { transform: scale(1); }
+  40%  { transform: scale(1.07); }
+  100% { transform: scale(1); }
+}
+.timer-time.pulse { animation: timerpulse 0.22s ease-out; }
+
+.timer-progress {
+  font-size: 0.9rem;
+  color: #555;
+  letter-spacing: 0.03em;
+  min-height: 1.2em;
+}
+
+.timer-controls {
+  display: flex;
+  gap: 0.75rem;
+  width: 100%;
+}
+.btn-timer-pause {
+  flex: 1;
+  background: #1e1e1e;
+  border: 1px solid #2a2a2a;
+  border-radius: 12px;
+  color: #e0e0e0;
+  font-size: 1rem;
+  font-weight: 600;
+  padding: 0.875rem;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.btn-timer-pause:active { background: #272727; }
+.btn-timer-abort {
+  background: #1e1a1a;
+  border: 1px solid #3a2222;
+  border-radius: 12px;
+  color: #e05555;
+  font-size: 1rem;
+  font-weight: 600;
+  padding: 0.875rem 1.25rem;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.btn-timer-abort:active { background: #2a1e1e; }
+
+/* phase background on content area */
+#timer-content { transition: background 0.4s ease; }
+#timer-content.phase-work     { background: #2d0f0f; }
+#timer-content.phase-rest     { background: #0f2d1a; }
+#timer-content.phase-set-pause { background: #0f2d1a; }

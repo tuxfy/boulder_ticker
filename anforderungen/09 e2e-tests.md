@@ -1,5 +1,5 @@
 -   **Title** E2E-Tests
--   **Status** in progress
+-   **Status** done
 
 # Anforderung
 
@@ -45,5 +45,5 @@ Nicht Teil dieser Anforderung: Scanner (benötigt Kamera) und Audio (`AudioConte
 -   [x] E2E-Test: localStorage-Persistenz des Boulder-Logs
 -   [x] E2E-Test: Gym-Auswahl
 -   [x] Tests lokal per Kommando ausführbar (Playwright startet den Server selbst)
--   [ ] GitHub Action führt die Tests automatisiert aus (CI) — Workflow angelegt, Bestätigung nach erstem Push
+-   [x] GitHub Action führt die Tests automatisiert aus (CI) — über die kombinierte Pipeline [[10 ci-cd-deploy-gating]], Lauf bestätigt
 -   [x] `README.md` enthält eine How-to-Anleitung zum Ausführen der Tests

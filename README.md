@@ -1,6 +1,25 @@
 # Bouldering Berlin
 
-Statische Single-File Web-App (`index.html`) mit PWA-Support (Manifest + Service Worker). Läuft ohne Build-Schritt direkt im Browser.
+Statische, **buildfreie** SPA mit PWA-Support (Manifest + Service Worker). Läuft ohne Build-Schritt direkt im Browser — als native ES-Module.
+
+> **Hinweis:** Weil die App native ES-Module nutzt, muss sie über einen Server (HTTP) laufen — ein direktes Öffnen von `index.html` per Doppelklick (`file://`) funktioniert nicht. Lokal: `npx serve` (siehe unten) oder die installierte PWA.
+
+## Projektstruktur
+
+```
+index.html          App-Hülle: CSS-Links, View-Container, Einstiegsskript
+manifest.json       PWA-Manifest
+sw.js               Service Worker (versionierter Offline-Cache — Version bei jeder Freigabe hochzählen!)
+styles/base.css     globale Styles (Theme, Shell, geteiltes .stepper)
+src/
+  app.js            Einstieg: Views mounten + Router starten
+  core/             router.js · store.js (localStorage) · api.js (Firestore) · audio.js
+  views/<name>/     je View ein Ordner mit <name>.js (Logik + Markup-Template) und <name>.css
+                    menu · timer · boulderlog · gym · scanner
+  vendor/jsqr.js    QR-Bibliothek (lazy, erst beim Scannen geladen)
+```
+
+Ereignisse werden ausschließlich per `addEventListener` gebunden (keine Inline-`onclick`). Neue Dateien, die offline verfügbar sein sollen, müssen in die `SHELL`-Liste in `sw.js` aufgenommen werden.
 
 ## Lokales Testen auf dem iPhone (gleiches WLAN)
 
