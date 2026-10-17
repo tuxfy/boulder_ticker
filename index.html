@@ -10944,7 +10944,8 @@ function findAlignmentPattern(matrix, alignmentPatternQuads, topRight, topLeft, 
 
     function getAudioCtx() {
       if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-      if (audioCtx.state === 'suspended') audioCtx.resume();
+      // iOS setzt den Kontext beim Gerätesperren auf 'interrupted' (nicht 'suspended') — beide reaktivieren
+      if (audioCtx.state === 'suspended' || audioCtx.state === 'interrupted') audioCtx.resume();
       return audioCtx;
     }
 

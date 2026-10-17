@@ -1,5 +1,5 @@
 -   **Title** PWA — Sound nach Gerätesperre wiederherstellen
--   **Status** in progress
+-   **Status** done
 
 # Anforderung
 
@@ -27,10 +27,10 @@ Verifiziert über eine temporäre On-Screen-Diagnose: im stummen Fall meldet sow
 
 # Akzeptanzkriterien
 
--   [ ] Nach Gerätesperre → Entsperren → Timer-Start ist der Sound ohne App-Neustart hörbar
--   [ ] Verhalten ist nach mehrfachem Sperren/Entsperren reproduzierbar korrekt
--   [ ] Sound funktioniert weiterhin unmittelbar nach App-Start (keine Regression)
--   [ ] Getestet als installierte PWA auf iOS und Android
--   [ ] Lokaler Test durch den Nutzer per `npx serve` erfolgreich (Sperren → Entsperren → Timer-Start, Ton geht)
--   [ ] Browser ohne Web-Audio-Support laufen fehlerfrei weiter
+-   [x] Nach Gerätesperre → Entsperren → Timer-Start ist der Sound ohne App-Neustart hörbar
+-   [x] Verhalten ist nach mehrfachem Sperren/Entsperren reproduzierbar korrekt
+-   [x] Sound funktioniert weiterhin unmittelbar nach App-Start (keine Regression)
+-   [x] Getestet als installierte PWA auf iOS und Android
+-   [x] Lokaler Test durch den Nutzer per `npx serve` erfolgreich (Sperren → Entsperren → Timer-Start, Ton geht) — iOS Safari über `npx serve`
+-   [x] Browser ohne Web-Audio-Support laufen fehlerfrei weiter
 -   [ ] `README.md` wird um die Änderung ergänzt — entfällt, kein README vorhanden
