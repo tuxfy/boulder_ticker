@@ -1,15 +1,19 @@
 {
   "name": "bouldering-berlin",
   "private": true,
-  "description": "Bouldering Berlin – statische PWA. E2E-Tests mit Playwright.",
+  "description": "Bouldering Berlin – statische PWA. Unit-Tests mit Vitest, E2E-Tests mit Playwright.",
   "scripts": {
-    "test": "playwright test --project=chromium",
+    "test": "npm run test:unit && npm run test:e2e",
+    "test:unit": "vitest run",
+    "test:e2e": "playwright test --project=chromium",
     "test:webkit": "playwright test --project=webkit",
     "test:all": "playwright test",
     "test:ui": "playwright test --ui",
     "test:report": "playwright show-report"
   },
   "devDependencies": {
-    "@playwright/test": "^1.48.0"
+    "@playwright/test": "^1.48.0",
+    "jsdom": "^24.1.0",
+    "vitest": "^2.1.0"
   }
 }

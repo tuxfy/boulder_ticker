@@ -1,4 +1,5 @@
 // Firestore-Zugriffe (BETA7) — aus index.html ausgelagert.
+import { gymNormKey } from './text.js';
 
 export const FSBASE = 'https://firestore.googleapis.com/v1/projects/beta7-206508/databases/(default)/documents';
 
@@ -17,16 +18,6 @@ export function unpackFields(fields) {
   const out = {};
   for (const [k, v] of Object.entries(fields)) out[k] = unpackValue(v);
   return out;
-}
-
-export function normalizeStr(s) {
-  return (s || '')
-    .normalize('NFKD')
-    .replace(/[̀-ͯ]/g, '')
-    .replace(/[^\w\s]/g, ' ')
-    .toLowerCase()
-    .replace(/\s+/g, ' ')
-    .trim();
 }
 
 // Lädt alle öffentlichen Hallen und gibt sie zurück (ohne Seiteneffekte/Caching).
@@ -53,7 +44,7 @@ export async function fetchGyms() {
       if (typeof f.address === 'string') city = f.address;
       else if (f.address && typeof f.address === 'object')
         city = String(f.address.city_name || f.address.city || f.address.locality || '');
-      gyms.push({ locationId, label, city, normKey: normalizeStr(label + ' ' + city) });
+      gyms.push({ locationId, label, city, normKey: gymNormKey(label, city) });
     }
     pageToken = json.nextPageToken || null;
   } while (pageToken);

@@ -1,6 +1,6 @@
 // WICHTIG: Bei jeder Freigabe die Version hochzählen, damit Clients die neue
 // App-Shell laden (alte Caches werden beim Aktivieren gelöscht).
-const CACHE = 'bouldering-v2';
+const CACHE = 'bouldering-v3';
 
 // Komplette App-Shell für den Offline-Start. Neue Dateien hier ergänzen!
 const SHELL = [
@@ -15,13 +15,17 @@ const SHELL = [
   './src/core/store.js',
   './src/core/api.js',
   './src/core/audio.js',
+  './src/core/text.js',
   './src/views/menu/menu.js',
   './src/views/menu/menu.css',
   './src/views/timer/timer.js',
+  './src/views/timer/timer.logic.js',
   './src/views/timer/timer.css',
   './src/views/boulderlog/boulderlog.js',
+  './src/views/boulderlog/boulderlog.logic.js',
   './src/views/boulderlog/boulderlog.css',
   './src/views/gym/gym.js',
+  './src/views/gym/gym.logic.js',
   './src/views/gym/gym.css',
   './src/views/scanner/scanner.js',
   './src/views/scanner/scanner.css',

@@ -1,7 +1,8 @@
 // Gym-/Hallen-Auswahl-View.
 import { navigate } from '../../core/router.js';
 import * as store from '../../core/store.js';
-import { fetchGyms, normalizeStr } from '../../core/api.js';
+import { fetchGyms } from '../../core/api.js';
+import { rankGyms, escHtml } from './gym.logic.js';
 
 const TEMPLATE = `
     <header class="tool-header">
@@ -26,10 +27,6 @@ let gymResults = [];
 
 export function gymGetSel() {
   return store.getJSON(LS_GYM_SEL);
-}
-
-function escHtml(s) {
-  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
 
 export function gymUpdateBar() {
@@ -61,34 +58,7 @@ async function refreshGymCache() {
 }
 
 function gymSearch(q) {
-  if (!gymCache) return [];
-  const sel = gymGetSel();
-  if (!q.trim()) {
-    const list = gymCache.slice();
-    if (sel) {
-      const idx = list.findIndex(g => g.locationId === sel.locationId);
-      if (idx > 0) list.unshift(list.splice(idx, 1)[0]);
-    }
-    return list.slice(0, 20);
-  }
-  const tokens = normalizeStr(q).split(' ').filter(Boolean);
-  const nq     = normalizeStr(q);
-  const hits   = gymCache.filter(g => {
-    const key = typeof g.normKey === 'string' ? g.normKey
-              : normalizeStr((g.label || '') + ' ' + (g.city || ''));
-    return tokens.every(t => key.includes(t));
-  });
-  hits.sort((a, b) => {
-    const rank = g => {
-      const n = normalizeStr(g.label);
-      if (n === nq) return 0;
-      if (n.startsWith(nq)) return 1;
-      if (tokens.some(t => n.startsWith(t))) return 2;
-      return 3;
-    };
-    return rank(a) - rank(b) || a.label.localeCompare(b.label);
-  });
-  return hits.slice(0, 20);
+  return rankGyms(gymCache, q, gymGetSel());
 }
 
 function gymRenderList() {

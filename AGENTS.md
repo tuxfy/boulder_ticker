@@ -49,7 +49,7 @@ Optional. Beschreibt das erwartete Verhalten aus Nutzersicht, z. B. für UI-Änd
 -   Nach der Implementierung werden alle Kriterien geprüft und abgehakt `[x]`.
 -   Die Kriterien **Test für das abzusichernde Verhalten geschrieben** und **`npm test` läuft grün durch** sind standardmäßig enthalten. Ersteres kann weggelassen werden, wenn sich die Änderung sinnvoll nicht per Test absichern lässt.
 -   Reihenfolge nach Red-Green: Der Test wird **vor** der Änderung geschrieben und ist ohne sie **rot**; erst nach der Implementierung wird er **grün**. Entsprechend wird „Test geschrieben" erst abgehakt, wenn der rote Test existiert, „`npm test` läuft grün durch" erst nach der Implementierung.
--   **Bevor** Kriterien abgehakt werden, müssen die Tests (`npm test`) grün durchlaufen.
+-   **Bevor** Kriterien abgehakt werden, müssen die Tests (`npm test`) grün durchlaufen — **ausgeführt vom Nutzer**; der Agent wartet auf dessen Bestätigung.
 -   Das Kriterium **Lokaler Test durch den Nutzer per `npx serve` erfolgreich** ist standardmäßig enthalten, wenn die Änderung nutzerrelevantes Verhalten betrifft.
 -   Erst wenn alle Kriterien erfüllt sind, wird der Status auf `done` gesetzt.
 
@@ -71,9 +71,9 @@ Secrets (API-Tokens, Passwörter, Schlüssel) werden niemals ausgegeben oder gel
 3. Bei Bug-Issues: Vermutungen zur Ursache werden **vor** der Implementierung des Fixes **lokal bestätigt** — über eine temporäre Diagnose und einen Test, den der **Nutzer per `npx serve`** (z. B. iPhone im selben WLAN) durchführt. Erst mit bestätigter Ursache wird der Fix geplant.
 4. Warten auf explizites **„Go"** des Nutzers — kein Code, kein Planen von Implementierungsdetails vorher
 5. Status auf `in progress` setzen
-6. **Vor der Änderung Test schreiben (Red)** — wo sinnvoll zuerst einen Playwright-Test ergänzen, der das erwartete Verhalten bzw. bei Bug-Issues die Regression absichert, und per `npm test` bestätigen, dass er ohne die Änderung **rot** ist
+6. **Vor der Änderung Test schreiben (Red)** — wo sinnvoll zuerst einen Test ergänzen, der das erwartete Verhalten bzw. bei Bug-Issues die Regression absichert: **Unit-Test (Vitest, co-lokalisiert als `src/**/*.test.js`)** für Logik in `src/core/`, **E2E-Test (Playwright, `tests/`)** für Nutzerflüsse im Browser. **Der Nutzer** lässt `npm test` laufen und bestätigt, dass der Test ohne die Änderung **rot** ist (`npm test` führt Unit- und E2E-Tests aus)
 7. **Implementieren (Green)**
-8. **Nach der Änderung Tests laufen lassen** (`npm test`) — **bevor** irgendein AK-Punkt abgehakt wird. Alle Tests müssen grün sein
+8. **Nach der Änderung lässt der Nutzer die Tests laufen** (`npm test`) und bestätigt das Ergebnis — **bevor** irgendein AK-Punkt abgehakt wird. Alle Tests müssen grün sein
 9. Jeden AK-Punkt prüfen und abhaken
 10. Status auf `done` setzen
 
@@ -82,3 +82,7 @@ Wird im Gespräch eine neue Idee oder Erweiterung besprochen, wird **zuerst** ei
 ## Commits
 
 -   **Der Agent committet nie.** Commits macht ausschließlich der Nutzer. Der Agent lässt Änderungen im Working Tree liegen und weist darauf hin.
+
+## Tests
+
+-   **Der Agent lässt die Tests nicht selbst laufen.** `npm test` führt ausschließlich der Nutzer aus. Der Agent schreibt die Tests, weist auf den nötigen Lauf hin und **wartet auf die grüne Bestätigung des Nutzers**, bevor er Akzeptanzkriterien abhakt oder den Status auf `done` setzt. Hintergrund: In der Sandbox ist keine zuverlässige, plattformrichtige Toolchain-Ausführung gegeben (kein Installieren/Reparieren der Toolchain in der Sandbox).

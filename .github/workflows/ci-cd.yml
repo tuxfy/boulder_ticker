@@ -29,11 +29,15 @@ jobs:
       - name: Install dependencies
         run: npm install
 
+      # Unit-Tests zuerst (Fail-fast) — vor der teuren Browser-Installation
+      - name: Run unit tests
+        run: npm run test:unit
+
       - name: Install Playwright browser
         run: npx playwright install --with-deps chromium
 
       - name: Run E2E tests
-        run: npm test
+        run: npm run test:e2e
 
       - name: Upload report
         if: ${{ !cancelled() }}

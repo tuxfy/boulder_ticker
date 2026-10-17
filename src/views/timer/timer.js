@@ -2,6 +2,7 @@
 import { navigate } from '../../core/router.js';
 import { unlockAudio, playBeep, playFinish, requestWakeLock, releaseWakeLock } from '../../core/audio.js';
 import * as store from '../../core/store.js';
+import { nextPhase, formatTime } from './timer.logic.js';
 
 const TEMPLATE = `
     <header class="tool-header">
@@ -176,42 +177,15 @@ function timerTick() {
 }
 
 function advancePhase() {
-  const { phase, workIdx, setIdx } = tState;
+  tState = nextPhase(tState, cfg);
 
-  if (phase === 'prep') {
-    tState.phase = 'work';
-    tState.timeLeft = cfg.work;
-
-  } else if (phase === 'work') {
-    const lastWork = workIdx >= cfg.numWork;
-    const lastSet  = setIdx  >= cfg.numSets;
-
-    if (lastWork && lastSet) {
-      tState.phase = 'done';
-      clearInterval(tInterval);
-      releaseWakeLock();
-      playFinish();
-      updateTimerDisplay();
-      setTimeout(() => { if (tState?.phase === 'done') timerReset(); }, 2500);
-      return;
-    } else if (lastWork) {
-      tState.phase = 'set-pause';
-      tState.timeLeft = cfg.setPause;
-    } else {
-      tState.phase = 'rest';
-      tState.timeLeft = cfg.rest;
-    }
-
-  } else if (phase === 'rest') {
-    tState.workIdx++;
-    tState.phase = 'work';
-    tState.timeLeft = cfg.work;
-
-  } else if (phase === 'set-pause') {
-    tState.setIdx++;
-    tState.workIdx = 1;
-    tState.phase = 'work';
-    tState.timeLeft = cfg.work;
+  if (tState.phase === 'done') {
+    clearInterval(tInterval);
+    releaseWakeLock();
+    playFinish();
+    updateTimerDisplay();
+    setTimeout(() => { if (tState?.phase === 'done') timerReset(); }, 2500);
+    return;
   }
 
   updateTimerDisplay();
@@ -275,12 +249,6 @@ function timerReset() {
   document.getElementById('timer-display').hidden = true;
   document.getElementById('timer-config').hidden = false;
   document.getElementById('timer-content').className = 'tool-content';
-}
-
-function formatTime(secs) {
-  const m = Math.floor(secs / 60);
-  const s = secs % 60;
-  return `${m}:${s.toString().padStart(2, '0')}`;
 }
 
 function pulseTime() {

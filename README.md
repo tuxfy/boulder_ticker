@@ -13,7 +13,7 @@ sw.js               Service Worker (versionierter Offline-Cache — Version bei 
 styles/base.css     globale Styles (Theme, Shell, geteiltes .stepper)
 src/
   app.js            Einstieg: Views mounten + Router starten
-  core/             router.js · store.js (localStorage) · api.js (Firestore) · audio.js
+  core/             router.js · store.js (localStorage) · api.js (Firestore) · audio.js · text.js (Suche/Normalisierung)
   views/<name>/     je View ein Ordner mit <name>.js (Logik + Markup-Template) und <name>.css
                     menu · timer · boulderlog · gym · scanner
   vendor/jsqr.js    QR-Bibliothek (lazy, erst beim Scannen geladen)
@@ -43,9 +43,12 @@ npx --yes serve -l 8000 .
   ```
 - `python3 -m http.server` ist auf macOS unzuverlässig (`[Errno 9] Bad file descriptor` beim Ausliefern) — daher `npx serve` bevorzugen.
 
-## Automatisierte Tests (E2E)
+## Automatisierte Tests
 
-End-to-End-Tests mit [Playwright](https://playwright.dev). Sie spielen echte Nutzerflüsse (Navigation, Timer, Boulder-Log inkl. localStorage, Gym-Auswahl) im Browser durch. Die Tests sind eine reine Dev-Abhängigkeit — die ausgelieferte App bleibt buildfrei.
+Zwei Ebenen, beide reine Dev-Abhängigkeiten — die ausgelieferte App bleibt buildfrei:
+
+- **Unit-Tests** ([Vitest](https://vitest.dev)) sichern die Logik-Module unter `src/core/` (Firestore-Antworten entpacken, String-Normalisierung, localStorage-Helfer, Hash-Routing) sowie rein extrahierte View-Logik (`timer.logic.js`, `boulderlog.logic.js`, `gym.logic.js`) isoliert und schnell ab. Sie liegen co-lokalisiert neben den Modulen als `*.test.js` unter `src/`.
+- **E2E-Tests** ([Playwright](https://playwright.dev)) spielen echte Nutzerflüsse (Navigation, Timer, Boulder-Log inkl. localStorage, Gym-Auswahl) im Browser durch. Sie liegen in `tests/`.
 
 **Einmalig einrichten:**
 
@@ -57,14 +60,16 @@ npx playwright install chromium
 **Tests ausführen:**
 
 ```
-npm test
+npm test            # Unit- und E2E-Tests (Chromium)
+npm run test:unit   # nur Unit-Tests (Vitest)
+npm run test:e2e    # nur E2E-Tests (Chromium)
 ```
 
-Playwright startet den lokalen Static-Server (`scripts/serve.js`, abhängigkeitsfrei) automatisch — ein separater Server muss **nicht** laufen.
+`npm test` führt zuerst die Unit-Tests und danach die E2E-Tests aus. Playwright startet den lokalen Static-Server (`scripts/serve.js`, abhängigkeitsfrei) automatisch — ein separater Server muss **nicht** laufen.
 
 **In WebKit (Safari-Engine) testen:**
 
-Da die App iOS-/Safari-lastig ist, lassen sich die Tests zusätzlich gegen die WebKit-Engine fahren — am nächsten am echten Zielbrowser. WebKit ist bewusst **nicht** Teil des Standard-Laufs (`npm test` = Chromium), sondern wird gezielt gestartet:
+Da die App iOS-/Safari-lastig ist, lassen sich die E2E-Tests zusätzlich gegen die WebKit-Engine fahren — am nächsten am echten Zielbrowser. WebKit ist bewusst **nicht** Teil des Standard-Laufs, sondern wird gezielt gestartet:
 
 ```
 npx playwright install webkit   # einmalig
@@ -75,17 +80,15 @@ npm run test:webkit
 
 ```
 npm run test:all      # alle Browser (Chromium + WebKit)
-npm run test:ui       # interaktiver UI-Modus
+npm run test:ui       # interaktiver UI-Modus (Playwright)
 npm run test:report   # letzten HTML-Report öffnen
 ```
-
-Die Testdateien liegen in `tests/`.
 
 ## CI/CD-Pipeline
 
 Die GitHub Action `.github/workflows/ci-cd.yml` vereint Test und Deploy:
 
-- **`test`-Job:** führt die E2E-Tests aus (Chromium). Läuft bei Push auf `main` **und** bei Pull Requests.
+- **`test`-Job:** führt zuerst die Unit-Tests (Vitest) und anschließend die E2E-Tests (Chromium) aus — Unit zuerst (Fail-fast), noch vor der Browser-Installation. Läuft bei Push auf `main` **und** bei Pull Requests.
 - **`deploy`-Job:** `needs: test` — veröffentlicht die Seite über GitHub Pages (`upload-pages-artifact` + `deploy-pages`). Läuft **nur** bei Push auf `main` und **nur**, wenn die Tests grün sind. Rote Tests ⇒ kein Deploy.
 
 Veröffentlicht wird das gesamte Repo-Root (ohne `.git`/`node_modules`), analog zum früheren Branch-Deploy.

@@ -16,4 +16,8 @@ export function initRouter({ screens, fallback, onShow }) {
   }
   window.addEventListener('hashchange', render);
   window.addEventListener('load', render);
+  return () => {
+    window.removeEventListener('hashchange', render);
+    window.removeEventListener('load', render);
+  };
 }

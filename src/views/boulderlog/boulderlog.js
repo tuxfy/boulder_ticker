@@ -2,6 +2,7 @@
 import { navigate } from '../../core/router.js';
 import * as store from '../../core/store.js';
 import { scanStart } from '../scanner/scanner.js';
+import { buildLine } from './boulderlog.logic.js';
 
 const TEMPLATE = `
     <header class="tool-header">
@@ -78,10 +79,6 @@ function changeTries(delta) {
 }
 
 function toggleSend() { sendBtn.classList.toggle('active'); }
-
-function buildLine(grade, t, send, style) {
-  return `- ${grade}: ${t} ${t === 1 ? 'try' : 'tries'}${send ? ' (send)' : ''}${style ? ` - ${style}` : ''}`;
-}
 
 function addEntry() {
   const grade = gradeEl.value.trim();
