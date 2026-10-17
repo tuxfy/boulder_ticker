@@ -60,4 +60,15 @@ npm run test:ui       # interaktiver UI-Modus
 npm run test:report   # letzten HTML-Report öffnen
 ```
 
-Die Testdateien liegen in `tests/`. In CI werden sie bei jedem Push/Pull-Request über die GitHub Action `.github/workflows/e2e.yml` ausgeführt (Chromium; WebKit kann dort bei Bedarf ergänzt werden).
+Die Testdateien liegen in `tests/`.
+
+## CI/CD-Pipeline
+
+Die GitHub Action `.github/workflows/ci-cd.yml` vereint Test und Deploy:
+
+- **`test`-Job:** führt die E2E-Tests aus (Chromium). Läuft bei Push auf `main` **und** bei Pull Requests.
+- **`deploy`-Job:** `needs: test` — veröffentlicht die Seite über GitHub Pages (`upload-pages-artifact` + `deploy-pages`). Läuft **nur** bei Push auf `main` und **nur**, wenn die Tests grün sind. Rote Tests ⇒ kein Deploy.
+
+Veröffentlicht wird das gesamte Repo-Root (ohne `.git`/`node_modules`), analog zum früheren Branch-Deploy.
+
+> **Einmalige Repo-Einstellung:** Unter **Settings → Pages → Source** muss **„GitHub Actions"** ausgewählt sein (nicht „Deploy from a branch"), damit dieser Workflow deployen darf.
