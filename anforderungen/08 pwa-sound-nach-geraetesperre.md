@@ -33,4 +33,4 @@ Verifiziert über eine temporäre On-Screen-Diagnose: im stummen Fall meldet sow
 -   [x] Getestet als installierte PWA auf iOS und Android
 -   [x] Lokaler Test durch den Nutzer per `npx serve` erfolgreich (Sperren → Entsperren → Timer-Start, Ton geht) — iOS Safari über `npx serve`
 -   [x] Browser ohne Web-Audio-Support laufen fehlerfrei weiter
--   [ ] `README.md` wird um die Änderung ergänzt — entfällt, kein README vorhanden
+-   [x] `README.md` wird um die Änderung ergänzt — entfällt, kein README vorhanden

@@ -4,7 +4,13 @@
 
 „Anforderung" meint hier **jede** umzusetzende Änderung — sowohl neue Features als auch **Bug-Issues**. Beide werden identisch behandelt: als Markdown-Datei in `anforderungen/`, im selben Format, mit demselben Workflow und denselben Akzeptanzkriterien. Für ein Bug-Issue beschreibt der Abschnitt „Anforderung" das erwartete korrekte Verhalten und „Hintergrund" das fehlerhafte Ist-Verhalten samt Ursache.
 
-Anforderungen liegen als Markdown-Dateien in `anforderungen/` und folgen diesem Aufbau:
+## Ablage & Lebenszyklus
+
+-   Neue Anforderungen/Issues werden **standardmäßig im Unterordner `anforderungen/backlog/`** angelegt — **unsortiert, ohne Nummernpräfix**, Status `new`.
+-   Setzt **der Nutzer** den Status auf `refined`, wandert das Dokument aus `backlog/` heraus nach `anforderungen/` und erhält die **nächste freie laufende Nummer** (es sortiert sich damit unten an). Erst dann ist es für die Umsetzung vorgesehen.
+-   Erst nach explizitem **„Go"** des Nutzers beginnt die Umsetzung.
+
+Anforderungen folgen diesem Aufbau:
 
 ```
 -   **Title** Kurzer Titel
@@ -55,8 +61,8 @@ Secrets (API-Tokens, Passwörter, Schlüssel) werden niemals ausgegeben oder gel
 
 **Pflicht: Kein Code ohne zugehöriges Anforderungsdokument und explizites Go.** Reihenfolge ist verbindlich:
 
-1. Anforderungsdokument in `anforderungen/` anlegen, Status `new`
-2. Anforderung ausschärfen — Hintergrund, Verhalten, Akzeptanzkriterien ergänzen — mit dem Nutzer abstimmen; **der Nutzer setzt den Status auf `refined`**
+1. Anforderungsdokument in `anforderungen/backlog/` anlegen (unsortiert, ohne Nummernpräfix), Status `new`
+2. Anforderung ausschärfen — Hintergrund, Verhalten, Akzeptanzkriterien ergänzen — mit dem Nutzer abstimmen; **der Nutzer setzt den Status auf `refined`**. Damit wandert das Dokument aus `backlog/` nach `anforderungen/` und erhält die nächste laufende Nummer.
 3. Bei Bug-Issues: Vermutungen zur Ursache werden **vor** der Implementierung des Fixes **lokal bestätigt** — über eine temporäre Diagnose und einen Test, den der **Nutzer per `npx serve`** (z. B. iPhone im selben WLAN) durchführt. Erst mit bestätigter Ursache wird der Fix geplant.
 4. Warten auf explizites **„Go"** des Nutzers — kein Code, kein Planen von Implementierungsdetails vorher
 5. Status auf `in progress` setzen, dann implementieren
