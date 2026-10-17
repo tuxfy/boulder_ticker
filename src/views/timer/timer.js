@@ -2,7 +2,11 @@
 import { navigate } from '../../core/router.js';
 import { unlockAudio, playBeep, playFinish, requestWakeLock, releaseWakeLock } from '../../core/audio.js';
 import * as store from '../../core/store.js';
-import { nextPhase, formatTime } from './timer.logic.js';
+import {
+  nextPhase, PREP_SECS, CIRCUMFERENCE,
+  formatMs, phaseDurationMs, progress, dashOffset,
+  phaseVisual, segmentFills, segmentColor, nextInfo,
+} from './timer.logic.js';
 
 const TEMPLATE = `
     <header class="tool-header">
@@ -78,14 +82,41 @@ const TEMPLATE = `
         <button class="btn-timer-start" data-action="start">Start</button>
       </div>
 
-      <!-- DISPLAY -->
+      <!-- DISPLAY (Redesign nach Mockup) -->
       <div id="timer-display" hidden>
-        <div class="timer-phase-label" id="timer-phase">VORBEREITUNG</div>
-        <div class="timer-time" id="timer-time">0:10</div>
-        <div class="timer-progress" id="timer-progress"></div>
+        <div class="timer-meta">
+          <span>Work <b id="timer-work">1 / 5</b></span>
+          <span>Set <b id="timer-set">1 / 2</b></span>
+        </div>
+
+        <div class="timer-ring">
+          <svg viewBox="0 0 300 300" aria-hidden="true">
+            <circle class="timer-ring-track" cx="150" cy="150" r="138"></circle>
+            <circle class="timer-ring-prog" id="timer-ring-prog" cx="150" cy="150" r="138"
+                    stroke-dasharray="${CIRCUMFERENCE}" stroke-dashoffset="${CIRCUMFERENCE}"></circle>
+          </svg>
+          <div class="timer-ring-center">
+            <div class="timer-phase-label" id="timer-phase">GET READY</div>
+            <div class="timer-time" id="timer-time">0:10</div>
+            <div class="timer-sub" id="timer-sub">Mach dich bereit</div>
+          </div>
+        </div>
+
+        <div class="timer-segments" id="timer-segments"></div>
+
+        <div class="timer-next">
+          <span class="timer-next-dot" id="timer-next-dot"></span>
+          <span id="timer-next-text"></span>
+        </div>
+
         <div class="timer-controls">
-          <button class="btn-timer-pause" id="btn-pause" data-action="pause">Pause</button>
-          <button class="btn-timer-abort" data-action="reset">Reset</button>
+          <button class="btn-timer-reset" data-action="reset" aria-label="Reset">
+            <span class="timer-btn-icon">↺</span>Reset
+          </button>
+          <button class="btn-timer-toggle" id="btn-toggle" data-action="toggle">Pause</button>
+          <button class="btn-timer-skip" data-action="skip" aria-label="Überspringen">
+            <span class="timer-btn-icon">⇥</span>Skip
+          </button>
         </div>
       </div>
 
@@ -94,7 +125,6 @@ const TEMPLATE = `
 
 // ── TIMER ─────────────────────────────────────────────────────
 const TIMER_KEY = store.KEYS.timerCfg;
-const PREP_SECS = 10;
 
 const PARAM_META = {
   work:     { min: 1,  max: 600 },
@@ -147,98 +177,120 @@ function clampParam(key) {
 }
 
 // timer state
-let tState = null;
+let tState = null;       // { phase, remainingMs, workIdx, setIdx, paused }
 let tInterval = null;
+let tLast = null;        // Zeitstempel des letzten Ticks (ms), für kontinuierliches Herunterzählen
+let tPrevSec = null;     // zuletzt angezeigte Ganzsekunde — für Beep-Flanken
 
 function timerStart() {
-  if (tInterval) return;
   saveTimerCfg();
   unlockAudio(); // iOS: stiller Buffer entsperrt den Audio-Stack im User-Gesture
-  tState = { phase: 'prep', timeLeft: PREP_SECS, workIdx: 1, setIdx: 1, paused: false };
+  tState = { phase: 'prep', remainingMs: PREP_SECS * 1000, workIdx: 1, setIdx: 1, paused: false };
+  tLast = Date.now(); // Startzeit, damit der erste Tick eine echte Zeitdifferenz hat
+  tPrevSec = Math.ceil(tState.remainingMs / 1000);
   document.getElementById('timer-config').hidden = true;
   document.getElementById('timer-display').hidden = false;
-  updateTimerDisplay();
+  renderTimer();
   requestWakeLock();
-  tInterval = setInterval(timerTick, 1000);
+  if (!tInterval) tInterval = setInterval(timerTick, 100);
 }
 
 function timerTick() {
-  if (tState.paused) return;
-  tState.timeLeft--;
+  if (!tState || tState.paused) { tLast = null; return; }
+  const now = Date.now();
+  const dt = tLast != null ? now - tLast : 0;
+  tLast = now;
+  tState.remainingMs -= dt;
 
-  if (tState.timeLeft <= 0) {
+  // Beep an den Sekundengrenzen 3/2/1
+  const sec = Math.max(0, Math.ceil(tState.remainingMs / 1000));
+  if (sec < tPrevSec) {
+    if (sec >= 1 && sec <= 3) { playBeep(880, 0.08); pulseTime(); }
+    tPrevSec = sec;
+  }
+
+  if (tState.remainingMs <= 0) {
     playBeep(440, 0.35);
     advancePhase();
-  } else {
-    if (tState.timeLeft <= 3) playBeep(880, 0.08);
-    if (tState.timeLeft <= 3) pulseTime();
-    updateTimerDisplay();
+    return;
   }
+  renderTimer();
 }
 
 function advancePhase() {
+  const carry = tState.remainingMs; // negativer Überhang für genaues Weiterzählen
   tState = nextPhase(tState, cfg);
 
   if (tState.phase === 'done') {
     clearInterval(tInterval);
+    tInterval = null;
+    tState.remainingMs = 0;
     releaseWakeLock();
     playFinish();
-    updateTimerDisplay();
-    setTimeout(() => { if (tState?.phase === 'done') timerReset(); }, 2500);
+    renderTimer(); // DONE-Screen, kein Auto-Rücksprung (Entscheidung 4)
     return;
   }
 
-  updateTimerDisplay();
+  tState.remainingMs = phaseDurationMs(tState.phase, cfg) + carry;
+  tPrevSec = Math.ceil(tState.remainingMs / 1000);
+  renderTimer();
 }
 
-function updateTimerDisplay() {
-  const { phase, timeLeft, workIdx, setIdx } = tState;
-  const phaseEl    = document.getElementById('timer-phase');
-  const timeEl     = document.getElementById('timer-time');
-  const progressEl = document.getElementById('timer-progress');
-  const content    = document.getElementById('timer-content');
+function renderTimer() {
+  const { phase, remainingMs, workIdx, setIdx } = tState;
+  const dur  = phaseDurationMs(phase, cfg);
+  const prog = progress(remainingMs, dur);
+  const vis  = phaseVisual(phase);
 
-  const labels = {
-    prep:       'Vorbereitung',
-    work:       'Work',
-    rest:       'Rest',
-    'set-pause':'Set-Pause',
-    done:       'Fertig',
-  };
-  phaseEl.textContent = labels[phase] ?? phase;
-  phaseEl.className = 'timer-phase-label';
-  if (phase === 'work') phaseEl.classList.add('work');
-  if (phase === 'rest' || phase === 'set-pause') phaseEl.classList.add('rest');
+  const display = document.getElementById('timer-display');
+  display.style.background = vis.bg;
+  display.style.setProperty('--accent', vis.accent);
 
-  timeEl.textContent = phase === 'done' ? '—' : formatTime(timeLeft);
+  document.getElementById('timer-phase').textContent = vis.label;
+  document.getElementById('timer-time').textContent  = formatMs(Math.max(0, remainingMs));
+  document.getElementById('timer-sub').textContent    = vis.sub;
 
-  content.className = 'tool-content';
-  if (phase === 'work')      content.classList.add('phase-work');
-  if (phase === 'rest')      content.classList.add('phase-rest');
-  if (phase === 'set-pause') content.classList.add('phase-set-pause');
+  document.getElementById('timer-ring-prog')
+    .setAttribute('stroke-dashoffset', dashOffset(prog).toFixed(2));
 
-  if (phase === 'work' || phase === 'rest') {
-    progressEl.textContent = `Work ${workIdx} / ${cfg.numWork} · Set ${setIdx} / ${cfg.numSets}`;
-  } else if (phase === 'set-pause') {
-    progressEl.textContent = `Set ${setIdx} / ${cfg.numSets} abgeschlossen`;
-  } else {
-    progressEl.textContent = '';
-  }
+  renderSegments(segmentFills(phase, workIdx, cfg.numWork, prog), segmentColor(phase));
 
-  const pauseBtn = document.getElementById('btn-pause');
-  if (phase === 'done') {
-    pauseBtn.hidden = true;
-  } else {
-    pauseBtn.hidden = false;
-    pauseBtn.textContent = tState.paused ? 'Weiter' : 'Pause';
-  }
+  document.getElementById('timer-work').textContent = `${Math.min(workIdx, cfg.numWork)} / ${cfg.numWork}`;
+  document.getElementById('timer-set').textContent  = `${Math.min(setIdx, cfg.numSets)} / ${cfg.numSets}`;
+
+  const nx = nextInfo(tState, cfg);
+  document.getElementById('timer-next-text').textContent = nx.text;
+  document.getElementById('timer-next-dot').style.background = nx.color;
+
+  const toggle = document.getElementById('btn-toggle');
+  toggle.textContent = phase === 'done' ? 'Neu starten' : (tState.paused ? 'Weiter' : 'Pause');
 }
 
-function timerTogglePause() {
+function renderSegments(fills, color) {
+  const wrap = document.getElementById('timer-segments');
+  if (wrap.children.length !== fills.length) {
+    wrap.innerHTML = fills.map(() => '<div class="timer-seg"><div class="timer-seg-fill"></div></div>').join('');
+  }
+  fills.forEach((f, i) => {
+    const fill = wrap.children[i].firstElementChild;
+    fill.style.width = `${f * 100}%`;
+    fill.style.background = color;
+  });
+}
+
+function timerToggle() {
+  if (!tState) return;
+  if (tState.phase === 'done') { timerStart(); return; } // „Neu starten"
   tState.paused = !tState.paused;
-  document.getElementById('btn-pause').textContent = tState.paused ? 'Weiter' : 'Pause';
-  if (tState.paused) releaseWakeLock();
-  else requestWakeLock();
+  if (tState.paused) { releaseWakeLock(); }
+  else { tLast = null; requestWakeLock(); }
+  renderTimer();
+}
+
+function timerSkip() {
+  if (!tState || tState.phase === 'done') return;
+  tState.remainingMs = 0;
+  advancePhase();
 }
 
 function timerReset() {
@@ -248,7 +300,6 @@ function timerReset() {
   releaseWakeLock();
   document.getElementById('timer-display').hidden = true;
   document.getElementById('timer-config').hidden = false;
-  document.getElementById('timer-content').className = 'tool-content';
 }
 
 function pulseTime() {
@@ -258,9 +309,9 @@ function pulseTime() {
   el.classList.add('pulse');
 }
 
-
 document.addEventListener('visibilitychange', () => {
   if (document.visibilityState === 'visible' && tState && !tState.paused) {
+    tLast = null; // verhindert Zeitsprung durch Hintergrund-Pause
     requestWakeLock();
   }
 });
@@ -275,7 +326,8 @@ export function mountTimer() {
     inp.addEventListener('blur', () => clampParam(inp.dataset.param));
   });
   el.querySelector('[data-action="start"]').addEventListener('click', timerStart);
-  el.querySelector('[data-action="pause"]').addEventListener('click', timerTogglePause);
+  el.querySelector('[data-action="toggle"]').addEventListener('click', timerToggle);
+  el.querySelector('[data-action="skip"]').addEventListener('click', timerSkip);
   el.querySelector('[data-action="reset"]').addEventListener('click', timerReset);
   loadTimerCfg();
 }

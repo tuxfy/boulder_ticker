@@ -51,6 +51,7 @@ Optional. Beschreibt das erwartete Verhalten aus Nutzersicht, z. B. für UI-Änd
 -   Reihenfolge nach Red-Green: Der Test wird **vor** der Änderung geschrieben und ist ohne sie **rot**; erst nach der Implementierung wird er **grün**. Entsprechend wird „Test geschrieben" erst abgehakt, wenn der rote Test existiert, „`npm test` läuft grün durch" erst nach der Implementierung.
 -   **Bevor** Kriterien abgehakt werden, müssen die Tests (`npm test`) grün durchlaufen — **ausgeführt vom Nutzer**; der Agent wartet auf dessen Bestätigung.
 -   Das Kriterium **Lokaler Test durch den Nutzer per `npx serve` erfolgreich** ist standardmäßig enthalten, wenn die Änderung nutzerrelevantes Verhalten betrifft.
+-   Werden **ausgelieferte Dateien (App-Shell)** geändert, wird die **Service-Worker-Cache-Version in `sw.js` hochgezählt** — sonst laden Clients die alte Shell. Dieses Kriterium ist Teil der Definition of Done, sobald App-Shell-Dateien betroffen sind.
 -   Erst wenn alle Kriterien erfüllt sind, wird der Status auf `done` gesetzt.
 
 ## Sicherheit
@@ -86,3 +87,26 @@ Wird im Gespräch eine neue Idee oder Erweiterung besprochen, wird **zuerst** ei
 ## Tests
 
 -   **Der Agent lässt die Tests nicht selbst laufen.** `npm test` führt ausschließlich der Nutzer aus. Der Agent schreibt die Tests, weist auf den nötigen Lauf hin und **wartet auf die grüne Bestätigung des Nutzers**, bevor er Akzeptanzkriterien abhakt oder den Status auf `done` setzt. Hintergrund: In der Sandbox ist keine zuverlässige, plattformrichtige Toolchain-Ausführung gegeben (kein Installieren/Reparieren der Toolchain in der Sandbox).
+
+## Mockup-Umsetzung
+
+Für UI aus einem Mockup gilt dieser Ablauf, damit die Umsetzung die Vorlage **exakt** trifft statt sie zu paraphrasieren.
+
+**Grundsatz:** Die Mockup-Quelle ist die *ausführbare* Spezifikation — kein Bild. Ihre Logik (`renderVals()`, Formeln wie `dashOffset = 867.08 * (1 - prog)`) ist bereits quasi-reines JS. Diese Logik wird **gelesen und portiert, nicht frei nachgebaut** — und **nicht** als laufende Oracle ausgeführt. Die Quelle (`support.js`) braucht React/Babel, hartes `Date.now()`, externe Fonts und rendert offline anders; sie headless durch eine Zeitsequenz zu fahren wäre teure, brüchige Maschinerie für etwas, das sich direkt portieren und per Unit-Test absichern lässt.
+
+**Ablage:** Mockups liegen in **Quellform** (`*.dc.html` **mit** `support.js`) unter `anforderungen/mockups/<name>/` und werden aus der Anforderung relativ referenziert. Das gebündelte Einzel-Artifact ist nur Vorschau.
+
+**Ablauf:**
+
+1. **Quelle erfassen** — Quellform ablegen (s. o.).
+2. **Mockup-Spezifikation extrahieren** — als abhakbare Liste in die Anforderung, in drei Teilen:
+    - *Was man sieht:* Maße, Farben, Schrift, Layout — konkrete Werte aus der Quelle.
+    - *Was es tut:* Zustände, Übergänge, Timing und die **Formeln/Modelle** hinter Animationen — wörtlich aus der Logik der Quelle.
+    - *Was weggelassen wird:* bewusste Abgrenzung.
+3. **Modell abgleichen** — passt das App-Modell zum Mockup-Modell? Zwei Fälle:
+    - *Werte-Abweichung* (z. B. kontinuierliche ms-Zeit vs. Ganzsekunden): Agent legt sie **offen, der Nutzer entscheidet** (App anpassen oder dokumentierte Abweichung). Nie stillschweigend approximieren.
+    - *Struktur-Abweichung* (die App kann mehr als das Mockup, z. B. Vorbereitung/Set-Pause ohne Vorlage): Das Mockup ist dann eine **Teilmenge**. Festhalten, welche App-Teile ohne Mockup-Vorlage existieren — für die greift nur die normale Anforderungs-Absicherung, nicht der Mockup-Abgleich.
+4. **Portieren statt paraphrasieren** — die reinen Formeln/Werte 1:1 aus der Quelle als pure Funktionen übernehmen (Berechnung getrennt von der View): app-weite Logik nach `src/core/`, view-spezifische in das co-lokalisierte `*.logic.js` der jeweiligen View (z. B. `src/views/timer/timer.logic.js`).
+5. **Per Unit-Test verifizieren** — die portierten Funktionen mit Vitest gegen die Werte prüfen, die die Mockup-Formel an gewählten Zeitpunkten/Zuständen liefert. Das ist die „gleiche Zeitsequenz" auf **Datenebene** — deterministisch und offline, ohne Rendering.
+6. **Optik einmalig abgleichen** — Farben, Abstände, Schrift per Blick gegen das Vorschau-Artifact. Nicht automatisiert; das gebündelte Artifact genügt.
+7. **Definition of Done** — jeder Punkt der Mockup-Spezifikation erfüllt: die portierten Formeln per Unit-Test bestätigt, die Optik gegen die Vorschau abgeglichen. „Sieht plausibel aus" reicht nicht.

@@ -23,36 +23,51 @@ test.describe('Timer', () => {
     expect(cfg.work).toBe(46);
   });
 
-  test('startet und läuft durch die Phasen (Vorbereitung → Work → Rest)', async ({ page }) => {
+  test('startet und läuft durch die Phasen (GET READY → WORK → REST)', async ({ page }) => {
     await page.getByRole('button', { name: 'Start' }).click();
 
     await expect(page.locator('#timer-display')).toBeVisible();
     await expect(page.locator('#timer-config')).toBeHidden();
-    await expect(page.locator('#timer-phase')).toHaveText('Vorbereitung');
+    await expect(page.locator('#timer-phase')).toHaveText('GET READY');
     await expect(page.locator('#timer-time')).toHaveText('0:10');
 
     // 10 s Vorbereitung → Work (Standard: 45 s)
     await page.clock.runFor(10_000);
-    await expect(page.locator('#timer-phase')).toHaveText('Work');
+    await expect(page.locator('#timer-phase')).toHaveText('WORK');
     await expect(page.locator('#timer-time')).toHaveText('0:45');
 
     // 45 s Work → Rest (Standard: 90 s)
     await page.clock.runFor(45_000);
-    await expect(page.locator('#timer-phase')).toHaveText('Rest');
+    await expect(page.locator('#timer-phase')).toHaveText('REST');
     await expect(page.locator('#timer-time')).toHaveText('1:30');
   });
 
   test('pausiert den Lauf', async ({ page }) => {
     await page.getByRole('button', { name: 'Start' }).click();
     await page.clock.runFor(10_000); // in die Work-Phase
-    await expect(page.locator('#timer-phase')).toHaveText('Work');
+    await expect(page.locator('#timer-phase')).toHaveText('WORK');
     await expect(page.locator('#timer-time')).toHaveText('0:45');
 
-    await page.locator('#btn-pause').click();
-    await expect(page.locator('#btn-pause')).toHaveText('Weiter');
+    await page.locator('#btn-toggle').click();
+    await expect(page.locator('#btn-toggle')).toHaveText('Weiter');
 
     // Während der Pause läuft die Zeit nicht weiter
     await page.clock.runFor(5_000);
     await expect(page.locator('#timer-time')).toHaveText('0:45');
+  });
+
+  test('überspringt die aktuelle Phase', async ({ page }) => {
+    await page.getByRole('button', { name: 'Start' }).click();
+    await expect(page.locator('#timer-phase')).toHaveText('GET READY');
+
+    // Skip aus der Vorbereitung → direkt in die Work-Phase (ohne Zeit verstreichen zu lassen)
+    await page.getByRole('button', { name: 'Überspringen' }).click();
+    await expect(page.locator('#timer-phase')).toHaveText('WORK');
+    await expect(page.locator('#timer-time')).toHaveText('0:45');
+
+    // Skip aus Work → Rest
+    await page.getByRole('button', { name: 'Überspringen' }).click();
+    await expect(page.locator('#timer-phase')).toHaveText('REST');
+    await expect(page.locator('#timer-time')).toHaveText('1:30');
   });
 });

@@ -50,36 +50,87 @@
 }
 .btn-timer-start:active { background: #ddd; }
 
-/* timer active display */
+/* ── Laufansicht (Redesign nach Mockup) ── */
 #timer-display {
+  --accent: oklch(0.85 0.02 150);
   flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: space-between;
-  padding: 2.5rem 0 1rem;
-  text-align: center;
+  justify-content: center;
+  gap: 28px;
+  padding: 8px 20px 24px;
+  color: #f3f4f2;
+  background: oklch(0.18 0.01 150);
+  transition: background 600ms ease;
+  font-family: -apple-system, system-ui, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+}
+
+/* Work / Set Chips */
+.timer-meta {
+  display: flex;
+  justify-content: center;
+  gap: 28px;
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.6);
+}
+.timer-meta b { color: #fff; font-weight: 600; font-variant-numeric: tabular-nums; }
+
+/* Kreis-Fortschritt */
+.timer-ring {
+  position: relative;
+  width: 300px;
+  height: 300px;
+  max-width: 78vw;
+  max-height: 78vw;
+}
+.timer-ring svg {
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+}
+.timer-ring-track {
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.08);
+  stroke-width: 10;
+}
+.timer-ring-prog {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 10;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 120ms linear, stroke 600ms ease;
+}
+.timer-ring-center {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
 }
 
 .timer-phase-label {
-  font-size: 1rem;
-  font-weight: 700;
-  letter-spacing: 0.25em;
-  text-transform: uppercase;
-  color: #555;
-  transition: color 0.3s;
-}
-.timer-phase-label.work  { color: #e05555; }
-.timer-phase-label.rest  { color: #6bcb77; }
-
-.timer-time {
-  font-size: 6rem;
+  font-size: 15px;
   font-weight: 800;
-  letter-spacing: -0.03em;
-  color: #fff;
+  letter-spacing: 0.28em;
+  padding-left: 0.28em; /* kompensiert die Laufweite fürs optische Zentrieren */
+  color: var(--accent);
+  transition: color 600ms ease;
+}
+.timer-time {
+  font-size: 88px;
+  font-weight: 800;
+  letter-spacing: -0.04em;
   line-height: 1;
   font-variant-numeric: tabular-nums;
 }
+.timer-sub { font-size: 14px; font-weight: 500; color: rgba(255, 255, 255, 0.55); }
+
 @keyframes timerpulse {
   0%   { transform: scale(1); }
   40%  { transform: scale(1.07); }
@@ -87,46 +138,87 @@
 }
 .timer-time.pulse { animation: timerpulse 0.22s ease-out; }
 
-.timer-progress {
-  font-size: 0.9rem;
-  color: #555;
-  letter-spacing: 0.03em;
-  min-height: 1.2em;
-}
-
-.timer-controls {
+/* Segment-Balken */
+.timer-segments {
   display: flex;
-  gap: 0.75rem;
+  gap: 6px;
   width: 100%;
+  max-width: 300px;
 }
-.btn-timer-pause {
+.timer-seg {
   flex: 1;
-  background: #1e1e1e;
-  border: 1px solid #2a2a2a;
-  border-radius: 12px;
-  color: #e0e0e0;
-  font-size: 1rem;
-  font-weight: 600;
-  padding: 0.875rem;
-  cursor: pointer;
-  -webkit-tap-highlight-color: transparent;
+  height: 6px;
+  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.1);
+  overflow: hidden;
 }
-.btn-timer-pause:active { background: #272727; }
-.btn-timer-abort {
-  background: #1e1a1a;
-  border: 1px solid #3a2222;
-  border-radius: 12px;
-  color: #e05555;
-  font-size: 1rem;
-  font-weight: 600;
-  padding: 0.875rem 1.25rem;
-  cursor: pointer;
-  -webkit-tap-highlight-color: transparent;
+.timer-seg-fill {
+  height: 100%;
+  width: 0;
+  border-radius: 3px;
+  transition: width 120ms linear;
 }
-.btn-timer-abort:active { background: #2a1e1e; }
 
-/* phase background on content area */
-#timer-content { transition: background 0.4s ease; }
-#timer-content.phase-work     { background: #2d0f0f; }
-#timer-content.phase-rest     { background: #0f2d1a; }
-#timer-content.phase-set-pause { background: #0f2d1a; }
+/* „Als Nächstes" */
+.timer-next {
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 16px;
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.22);
+  font-size: 14px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.7);
+}
+.timer-next-dot { width: 8px; height: 8px; border-radius: 50%; background: rgba(255, 255, 255, 0.4); }
+
+/* Steuerung */
+.timer-controls {
+  display: grid;
+  grid-template-columns: 64px 1fr 64px;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+  max-width: 360px;
+}
+.btn-timer-reset,
+.btn-timer-skip {
+  height: 64px;
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  background: rgba(255, 255, 255, 0.06);
+  color: #e6e8e5;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  -webkit-tap-highlight-color: transparent;
+}
+.btn-timer-reset { color: #ff8a7a; }
+.btn-timer-reset:active,
+.btn-timer-skip:active { background: rgba(255, 255, 255, 0.12); }
+.timer-btn-icon { font-size: 22px; line-height: 1; }
+
+.btn-timer-toggle {
+  height: 72px;
+  border-radius: 24px;
+  border: none;
+  background: var(--accent);
+  color: #0d120e;
+  font-size: 19px;
+  font-weight: 800;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  transition: background 600ms ease, transform 120ms ease;
+  -webkit-tap-highlight-color: transparent;
+}
+.btn-timer-toggle:active { transform: scale(0.97); }

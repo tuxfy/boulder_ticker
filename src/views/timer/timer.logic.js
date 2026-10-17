@@ -1,5 +1,20 @@
 // Reine Timer-Logik ohne DOM/Seiteneffekte — unit-testbar.
 
+export const PREP_SECS = 10;
+
+// Umfang des Fortschrittskreises (r=138): 2·π·138 ≈ 867.08 — wörtlich aus dem Mockup.
+export const CIRCUMFERENCE = 867.08;
+
+// Phasen-Darstellung (Akzent/Hintergrund/Label/Sub-Label). Werte aus dem Mockup,
+// erweitert um die App-eigenen Phasen prep (GET READY) und set-pause (PAUSE).
+const VISUALS = {
+  work:        { accent: 'oklch(0.78 0.16 55)',  bg: 'oklch(0.21 0.045 50)',  label: 'WORK',      sub: 'Gib alles' },
+  rest:        { accent: 'oklch(0.78 0.16 150)', bg: 'oklch(0.21 0.045 155)', label: 'REST',      sub: 'Durchatmen' },
+  'set-pause': { accent: 'oklch(0.78 0.16 150)', bg: 'oklch(0.21 0.045 155)', label: 'PAUSE',     sub: 'Satz geschafft – kurz durchatmen' },
+  prep:        { accent: 'oklch(0.85 0.02 150)', bg: 'oklch(0.18 0.01 150)',  label: 'GET READY', sub: 'Mach dich bereit' },
+  done:        { accent: 'oklch(0.85 0.02 150)', bg: 'oklch(0.18 0.01 150)',  label: 'DONE',      sub: 'Alle Sätze geschafft' },
+};
+
 // Phasen-Zustandsmaschine: aktueller Zustand + Konfiguration → Folgezustand.
 // prep → work → (rest → work | set-pause → work) … → done.
 // Liefert ein neues Zustandsobjekt; unbeteiligte Felder (z. B. paused) bleiben erhalten.
@@ -30,4 +45,77 @@ export function formatTime(secs) {
   const m = Math.floor(secs / 60);
   const s = secs % 60;
   return `${m}:${s.toString().padStart(2, '0')}`;
+}
+
+// Millisekunden → "m:ss", auf ganze Sekunden aufgerundet (wie Mockup fmt()).
+export function formatMs(ms) {
+  const s = Math.max(0, Math.ceil(ms / 1000));
+  return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
+}
+
+// Dauer einer Phase in Millisekunden.
+export function phaseDurationMs(phase, cfg) {
+  switch (phase) {
+    case 'prep':      return PREP_SECS * 1000;
+    case 'work':      return cfg.work * 1000;
+    case 'rest':      return cfg.rest * 1000;
+    case 'set-pause': return cfg.setPause * 1000;
+    default:          return 0; // done
+  }
+}
+
+// Fortschritt 0…1: prog = 1 - remaining/dur, geklemmt. dur ≤ 0 (done) → 1.
+export function progress(remainingMs, durationMs) {
+  if (durationMs <= 0) return 1;
+  return Math.min(1, Math.max(0, 1 - remainingMs / durationMs));
+}
+
+// stroke-dashoffset des Fortschrittskreises.
+export function dashOffset(prog) {
+  return CIRCUMFERENCE * (1 - prog);
+}
+
+export function phaseVisual(phase) {
+  return VISUALS[phase] ?? VISUALS.prep;
+}
+
+export function phaseLabel(phase) {
+  return phaseVisual(phase).label;
+}
+
+// Füllgrad (0…1) je Segment-Balken (ein Balken pro Work-Runde des aktuellen Sets).
+export function segmentFills(phase, workIdx, numWork, prog) {
+  const out = [];
+  for (let r = 1; r <= numWork; r++) {
+    let fill;
+    if (phase === 'prep') fill = 0;
+    else if (phase === 'done' || phase === 'set-pause') fill = 1; // beendeter Set bleibt voll
+    else if (r < workIdx) fill = 1;
+    else if (r === workIdx) fill = phase === 'rest' ? 1 : prog;
+    else fill = 0;
+    out.push(fill);
+  }
+  return out;
+}
+
+// Balkenfarbe: Work/Rest Work-Akzent (orange, wie Mockup), Set-Pause grün, Done neutral.
+export function segmentColor(phase) {
+  if (phase === 'done') return VISUALS.done.accent;
+  if (phase === 'set-pause') return VISUALS['set-pause'].accent;
+  return VISUALS.work.accent;
+}
+
+const NEXT_SHORT = { work: 'Work', rest: 'Rest', 'set-pause': 'Pause' };
+
+// „Als Nächstes"-Hinweis: Text + Punktfarbe.
+export function nextInfo(state, cfg) {
+  const dim = 'rgba(255,255,255,0.4)';
+  if (state.phase === 'done') return { text: 'Workout beendet', color: dim };
+  const ns = nextPhase(state, cfg);
+  if (ns.phase === 'done') return { text: 'Letzte Runde', color: dim };
+  const label = NEXT_SHORT[ns.phase] ?? phaseVisual(ns.phase).label;
+  return {
+    text: `Als Nächstes: ${label} · ${formatMs(phaseDurationMs(ns.phase, cfg))}`,
+    color: phaseVisual(ns.phase).accent,
+  };
 }
