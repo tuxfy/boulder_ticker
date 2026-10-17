@@ -23,3 +23,41 @@ npx --yes serve -l 8000 .
   ifconfig | grep "inet " | grep -v 127.0.0.1
   ```
 - `python3 -m http.server` ist auf macOS unzuverlässig (`[Errno 9] Bad file descriptor` beim Ausliefern) — daher `npx serve` bevorzugen.
+
+## Automatisierte Tests (E2E)
+
+End-to-End-Tests mit [Playwright](https://playwright.dev). Sie spielen echte Nutzerflüsse (Navigation, Timer, Boulder-Log inkl. localStorage, Gym-Auswahl) im Browser durch. Die Tests sind eine reine Dev-Abhängigkeit — die ausgelieferte App bleibt buildfrei.
+
+**Einmalig einrichten:**
+
+```
+npm install
+npx playwright install chromium
+```
+
+**Tests ausführen:**
+
+```
+npm test
+```
+
+Playwright startet den lokalen Static-Server (`scripts/serve.js`, abhängigkeitsfrei) automatisch — ein separater Server muss **nicht** laufen.
+
+**In WebKit (Safari-Engine) testen:**
+
+Da die App iOS-/Safari-lastig ist, lassen sich die Tests zusätzlich gegen die WebKit-Engine fahren — am nächsten am echten Zielbrowser. WebKit ist bewusst **nicht** Teil des Standard-Laufs (`npm test` = Chromium), sondern wird gezielt gestartet:
+
+```
+npx playwright install webkit   # einmalig
+npm run test:webkit
+```
+
+**Weitere Kommandos:**
+
+```
+npm run test:all      # alle Browser (Chromium + WebKit)
+npm run test:ui       # interaktiver UI-Modus
+npm run test:report   # letzten HTML-Report öffnen
+```
+
+Die Testdateien liegen in `tests/`. In CI werden sie bei jedem Push/Pull-Request über die GitHub Action `.github/workflows/e2e.yml` ausgeführt (Chromium; WebKit kann dort bei Bedarf ergänzt werden).

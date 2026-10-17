@@ -1,5 +1,5 @@
 -   **Title** E2E-Tests
--   **Status** refined
+-   **Status** in progress
 
 # Anforderung
 
@@ -37,13 +37,13 @@ Nicht Teil dieser Anforderung: Scanner (benötigt Kamera) und Audio (`AudioConte
 
 # Akzeptanzkriterien
 
--   [ ] Playwright als E2E-Framework eingerichtet (Dev-Abhängigkeit, App bleibt buildfrei)
--   [ ] Testdateien liegen im eigenen Ordner `tests/`
--   [ ] E2E-Test: Navigation zwischen den Views
--   [ ] E2E-Test: Timer — Konfiguration, Start, Phasenwechsel (mit kontrollierter Uhr)
--   [ ] E2E-Test: Boulder-Log — Eintrag anlegen, Versuche +/−, Kopieren, Reset, Send-Toggle
--   [ ] E2E-Test: localStorage-Persistenz des Boulder-Logs
--   [ ] E2E-Test: Gym-Auswahl
--   [ ] Tests lokal per Kommando ausführbar (Playwright startet den Server selbst)
--   [ ] GitHub Action führt die Tests automatisiert aus (CI)
--   [ ] `README.md` enthält eine How-to-Anleitung zum Ausführen der Tests
+-   [x] Playwright als E2E-Framework eingerichtet (Dev-Abhängigkeit, App bleibt buildfrei)
+-   [x] Testdateien liegen im eigenen Ordner `tests/`
+-   [x] E2E-Test: Navigation zwischen den Views
+-   [x] E2E-Test: Timer — Konfiguration, Start, Phasenwechsel (mit kontrollierter Uhr)
+-   [x] E2E-Test: Boulder-Log — Eintrag anlegen, Versuche +/−, Kopieren, Reset, Send-Toggle
+-   [x] E2E-Test: localStorage-Persistenz des Boulder-Logs
+-   [x] E2E-Test: Gym-Auswahl
+-   [x] Tests lokal per Kommando ausführbar (Playwright startet den Server selbst)
+-   [ ] GitHub Action führt die Tests automatisiert aus (CI) — Workflow angelegt, Bestätigung nach erstem Push
+-   [x] `README.md` enthält eine How-to-Anleitung zum Ausführen der Tests
