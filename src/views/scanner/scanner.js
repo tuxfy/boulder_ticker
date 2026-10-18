@@ -5,7 +5,7 @@ import { gymGetSel } from '../gym/gym.js';
 const OVERLAY = `
     <video id="scanner-video" autoplay muted playsinline></video>
     <p class="scanner-overlay-hint">QR-Code in die Kamera halten …</p>
-    <button class="btn-scan-abort" data-action="abort">Abbrechen</button>`;
+    <button class="btn btn--secondary btn--compact btn-scan-abort" data-action="abort">Abbrechen</button>`;
 
 let scanStream = null;
 

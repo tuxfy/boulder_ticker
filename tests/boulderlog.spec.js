@@ -69,7 +69,7 @@ test.describe('Boulder-Log', () => {
     await expect(page.locator('#log')).not.toHaveValue('');
 
     page.once('dialog', (dialog) => dialog.accept());
-    await page.locator('.btn-reset').click();
+    await page.getByRole('button', { name: 'Reset' }).click();
 
     await expect(page.locator('#log')).toHaveValue('');
     const stored = await page.evaluate(() => localStorage.getItem('boulder_log'));

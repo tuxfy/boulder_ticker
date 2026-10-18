@@ -7,12 +7,12 @@ import { rankGyms, escHtml } from './gym.logic.js';
 const TEMPLATE = `
     <header class="tool-header">
       <h1>Halle wählen</h1>
-      <button class="btn-tools" data-nav="boulderlog">← Zurück</button>
+      <button class="btn btn--secondary btn--compact" data-nav="boulderlog">← Zurück</button>
     </header>
     <div class="tool-content">
       <div class="gym-search-row">
         <input type="text" id="gym-search" placeholder="Halle suchen …" autocomplete="off">
-        <button class="btn-gym-refresh" id="btn-gym-refresh">Aktualisieren</button>
+        <button class="btn btn--secondary btn--compact" id="btn-gym-refresh">Aktualisieren</button>
       </div>
       <p class="gym-status-line" id="gym-status"></p>
       <ul class="gym-list" id="gym-list"></ul>

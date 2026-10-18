@@ -7,14 +7,7 @@
   padding: 0 0.75rem; height: 44px; -webkit-appearance: none;
 }
 .gym-search-row input:focus { outline: none; border-color: #3a7bd5; }
-.btn-gym-refresh {
-  height: 44px; background: #1e1e1e; border: 1px solid #2a2a2a;
-  border-radius: 8px; color: #aaa; font-size: 0.85rem; font-weight: 600;
-  padding: 0 0.875rem; cursor: pointer; white-space: nowrap;
-  -webkit-tap-highlight-color: transparent;
-}
-.btn-gym-refresh:active { background: #272727; }
-.btn-gym-refresh:disabled { opacity: 0.4; }
+/* Aktualisieren = Sekundär/Kompakt aus dem Button-System (styles/base.css) */
 .gym-status-line { color: #666; font-size: 0.85rem; padding: 0.5rem 0; min-height: 1.4em; }
 .gym-list { list-style: none; }
 .gym-item {

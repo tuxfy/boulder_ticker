@@ -73,20 +73,7 @@
 .timer-cfg-stepper input:focus { outline: none; }
 .timer-cfg-unit { width: 12px; font-size: 14px; color: #555; }
 
-.btn-timer-start {
-  width: 100%;
-  margin-top: 24px;
-  height: 54px;
-  background: #fff;
-  border: none;
-  border-radius: 12px;
-  color: #111;
-  font-size: 17px;
-  font-weight: 700;
-  cursor: pointer;
-  -webkit-tap-highlight-color: transparent;
-}
-.btn-timer-start:active { background: #ddd; }
+/* Start-Button = globaler Primär-Block (styles/base.css); Abstand via #timer-config gap */
 
 /* ── Laufansicht (Redesign nach Mockup) ── */
 /* Einzige Farbquelle der Laufansicht: Phasenfarben als Custom Properties,

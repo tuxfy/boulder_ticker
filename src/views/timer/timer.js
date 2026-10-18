@@ -11,7 +11,7 @@ import {
 const TEMPLATE = `
     <header class="tool-header">
       <h1>Timer</h1>
-      <button class="btn-tools" data-nav="">⊞ Tools</button>
+      <button class="btn btn--secondary btn--compact" data-nav="">⊞ Tools</button>
     </header>
     <div class="tool-content" id="timer-content">
 
@@ -66,7 +66,7 @@ const TEMPLATE = `
             <span class="timer-cfg-unit">s</span>
           </div>
         </div>
-        <button class="btn-timer-start" data-action="start">Start</button>
+        <button class="btn btn--primary btn--block" data-action="start">Start</button>
       </div>
 
       <!-- DISPLAY (Redesign nach Mockup) -->

@@ -7,7 +7,7 @@ import { buildLine } from './boulderlog.logic.js';
 const TEMPLATE = `
     <header class="tool-header">
       <h1>Boulder Log</h1>
-      <button class="btn-tools" data-nav="">⊞ Tools</button>
+      <button class="btn btn--secondary btn--compact" data-nav="">⊞ Tools</button>
     </header>
     <div class="gym-bar">
       <button class="gym-bar-link" data-nav="gym" id="gym-bar-btn">
@@ -63,8 +63,8 @@ const TEMPLATE = `
       <textarea id="log" placeholder="Noch keine Einträge …" spellcheck="false"></textarea>
 
       <div class="actions">
-        <button class="btn-copy" id="copyBtn" data-action="copy">Kopieren</button>
-        <button class="btn-reset" data-action="reset">Reset</button>
+        <button class="btn btn--secondary btn--compact" id="copyBtn" data-action="copy">Kopieren</button>
+        <button class="btn btn--destructive btn--compact" data-action="reset">Reset</button>
       </div>
 
     </div>`;

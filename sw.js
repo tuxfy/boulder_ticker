@@ -1,6 +1,6 @@
 // WICHTIG: Bei jeder Freigabe die Version hochzählen, damit Clients die neue
 // App-Shell laden (alte Caches werden beim Aktivieren gelöscht).
-const CACHE = 'bouldering-v6';
+const CACHE = 'bouldering-v7';
 
 // Komplette App-Shell für den Offline-Start. Neue Dateien hier ergänzen!
 const SHELL = [

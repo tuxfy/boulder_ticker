@@ -12,12 +12,10 @@
   color: #666; font-size: 0.85rem; margin-top: 0.75rem;
   text-align: center; padding: 0 1rem;
 }
+/* Styling aus dem Button-System (styles/base.css); hier nur Positionierung.
+   Zentrierung ohne transform, damit sie nicht mit .btn:active (scale) kollidiert. */
 .btn-scan-abort {
   position: absolute; bottom: 2.5rem;
-  left: 50%; transform: translateX(-50%);
-  background: #1e1e1e; border: 1px solid #2a2a2a; border-radius: 12px;
-  color: #e0e0e0; font-size: 1rem; font-weight: 600;
-  padding: 0.875rem 2.5rem; cursor: pointer; white-space: nowrap;
-  -webkit-tap-highlight-color: transparent;
+  left: 0; right: 0; margin: 0 auto; width: max-content;
+  padding: 0 2.5rem;
 }
-.btn-scan-abort:active { background: #272727; }
