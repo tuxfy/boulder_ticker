@@ -1,31 +1,31 @@
 import { describe, it, expect } from 'vitest';
 import {
-  nextPhase, formatTime,
-  formatMs, phaseDurationMs, progress, dashOffset, CIRCUMFERENCE, PREP_SECS,
-  phaseLabel, phaseVisual, segmentFills, segmentColor, nextInfo,
+  nextPhase,
+  formatMs, phaseDurationMs, progress, dashOffset, CIRCUMFERENCE, RING_RADIUS, PREP_SECS,
+  phaseLabel, phaseVisual, segmentFills, nextInfo,
 } from './timer.logic.js';
 
 const cfg = { work: 45, rest: 90, numWork: 3, numSets: 2, setPause: 180 };
-const base = { phase: 'prep', timeLeft: 10, workIdx: 1, setIdx: 1, paused: false };
+const base = { phase: 'prep', workIdx: 1, setIdx: 1, paused: false };
 
 describe('nextPhase', () => {
   it('prep → work', () => {
-    expect(nextPhase({ ...base, phase: 'prep' }, cfg)).toMatchObject({ phase: 'work', timeLeft: 45 });
+    expect(nextPhase({ ...base, phase: 'prep' }, cfg)).toMatchObject({ phase: 'work' });
   });
   it('work → rest, wenn weitere Work-Intervalle folgen', () => {
-    expect(nextPhase({ ...base, phase: 'work', workIdx: 1 }, cfg)).toMatchObject({ phase: 'rest', timeLeft: 90 });
+    expect(nextPhase({ ...base, phase: 'work', workIdx: 1 }, cfg)).toMatchObject({ phase: 'rest' });
   });
   it('rest → work und erhöht workIdx', () => {
     expect(nextPhase({ ...base, phase: 'rest', workIdx: 1 }, cfg))
-      .toMatchObject({ phase: 'work', timeLeft: 45, workIdx: 2 });
+      .toMatchObject({ phase: 'work', workIdx: 2 });
   });
   it('letztes Work im Set (nicht letztes Set) → set-pause', () => {
     expect(nextPhase({ ...base, phase: 'work', workIdx: 3, setIdx: 1 }, cfg))
-      .toMatchObject({ phase: 'set-pause', timeLeft: 180 });
+      .toMatchObject({ phase: 'set-pause' });
   });
   it('set-pause → work, erhöht setIdx und setzt workIdx zurück', () => {
     expect(nextPhase({ ...base, phase: 'set-pause', workIdx: 3, setIdx: 1 }, cfg))
-      .toMatchObject({ phase: 'work', timeLeft: 45, setIdx: 2, workIdx: 1 });
+      .toMatchObject({ phase: 'work', setIdx: 2, workIdx: 1 });
   });
   it('letztes Work im letzten Set → done', () => {
     expect(nextPhase({ ...base, phase: 'work', workIdx: 3, setIdx: 2 }, cfg)).toMatchObject({ phase: 'done' });
@@ -33,18 +33,13 @@ describe('nextPhase', () => {
   it('erhält unbeteiligte Felder (paused)', () => {
     expect(nextPhase({ ...base, phase: 'prep', paused: true }, cfg).paused).toBe(true);
   });
-});
-
-describe('formatTime', () => {
-  it('formatiert Sekunden als m:ss mit führender Null', () => {
-    expect(formatTime(90)).toBe('1:30');
-    expect(formatTime(5)).toBe('0:05');
-    expect(formatTime(0)).toBe('0:00');
-    expect(formatTime(600)).toBe('10:00');
+  it('liefert kein (vestigiales) timeLeft mehr', () => {
+    expect('timeLeft' in nextPhase({ ...base, phase: 'prep' }, cfg)).toBe(false);
+    expect('timeLeft' in nextPhase({ ...base, phase: 'rest', workIdx: 1 }, cfg)).toBe(false);
   });
 });
 
-// ── Mockup-Redesign: portierte Formeln (Anforderung 13) ──────────
+// ── Mockup-Redesign: portierte Formeln (Anforderung 13/14) ───────
 // Werte wörtlich aus anforderungen/mockups/timer/Timer.dc.html (renderVals()).
 
 describe('formatMs', () => {
@@ -77,12 +72,15 @@ describe('progress', () => {
   });
 });
 
-describe('dashOffset', () => {
+describe('Ring-Geometrie', () => {
+  it('Umfang wird aus einer einzigen Radius-Quelle abgeleitet (nicht hartkodiert)', () => {
+    expect(RING_RADIUS).toBe(138);
+    expect(CIRCUMFERENCE).toBe(2 * Math.PI * RING_RADIUS);
+  });
   it('dashOffset = CIRCUMFERENCE * (1 - prog)', () => {
-    expect(CIRCUMFERENCE).toBeCloseTo(867.08, 2);
-    expect(dashOffset(0)).toBeCloseTo(867.08, 2);
-    expect(dashOffset(1)).toBeCloseTo(0, 2);
-    expect(dashOffset(0.5)).toBeCloseTo(433.54, 2);
+    expect(dashOffset(0)).toBeCloseTo(CIRCUMFERENCE, 5);
+    expect(dashOffset(1)).toBeCloseTo(0, 5);
+    expect(dashOffset(0.5)).toBeCloseTo(CIRCUMFERENCE / 2, 5);
   });
 });
 
@@ -97,31 +95,21 @@ describe('phaseLabel', () => {
 });
 
 describe('phaseVisual', () => {
-  it('Work: rote Akzentfarbe, dunkelwarmer Hintergrund', () => {
-    expect(phaseVisual('work')).toMatchObject({
-      accent: 'oklch(0.78 0.16 55)', bg: 'oklch(0.21 0.045 50)', label: 'WORK', sub: 'Gib alles',
-    });
+  // Nur noch Inhalt/Semantik — keine Farbwerte mehr (die leben in timer.css).
+  it('Work', () => {
+    expect(phaseVisual('work')).toEqual({ label: 'WORK', sub: 'Gib alles' });
   });
-  it('Rest: grüne Akzentfarbe', () => {
-    expect(phaseVisual('rest')).toMatchObject({
-      accent: 'oklch(0.78 0.16 150)', bg: 'oklch(0.21 0.045 155)', label: 'REST', sub: 'Durchatmen',
-    });
+  it('Rest', () => {
+    expect(phaseVisual('rest')).toEqual({ label: 'REST', sub: 'Durchatmen' });
   });
-  it('Set-Pause: grün wie Rest, eigenes Label/Sub-Label', () => {
-    expect(phaseVisual('set-pause')).toMatchObject({
-      accent: 'oklch(0.78 0.16 150)', bg: 'oklch(0.21 0.045 155)', label: 'PAUSE',
-      sub: 'Satz geschafft – kurz durchatmen',
-    });
+  it('Set-Pause', () => {
+    expect(phaseVisual('set-pause')).toEqual({ label: 'PAUSE', sub: 'Satz geschafft – kurz durchatmen' });
   });
-  it('Prep: neutraler Akzent, Label GET READY', () => {
-    expect(phaseVisual('prep')).toMatchObject({
-      accent: 'oklch(0.85 0.02 150)', bg: 'oklch(0.18 0.01 150)', label: 'GET READY', sub: 'Mach dich bereit',
-    });
+  it('Prep', () => {
+    expect(phaseVisual('prep')).toEqual({ label: 'GET READY', sub: 'Mach dich bereit' });
   });
-  it('Done: neutraler Akzent, Label DONE', () => {
-    expect(phaseVisual('done')).toMatchObject({
-      accent: 'oklch(0.85 0.02 150)', bg: 'oklch(0.18 0.01 150)', label: 'DONE', sub: 'Alle Sätze geschafft',
-    });
+  it('Done', () => {
+    expect(phaseVisual('done')).toEqual({ label: 'DONE', sub: 'Alle Sätze geschafft' });
   });
 });
 
@@ -143,48 +131,36 @@ describe('segmentFills', () => {
   });
 });
 
-describe('segmentColor', () => {
-  it('Work/Rest: Work-Akzent (orange, wie Mockup)', () => {
-    expect(segmentColor('work')).toBe('oklch(0.78 0.16 55)');
-    expect(segmentColor('rest')).toBe('oklch(0.78 0.16 55)');
-  });
-  it('Set-Pause: grün (Entscheidung 2)', () => {
-    expect(segmentColor('set-pause')).toBe('oklch(0.78 0.16 150)');
-  });
-  it('Done: neutraler Done-Akzent', () => {
-    expect(segmentColor('done')).toBe('oklch(0.85 0.02 150)');
-  });
-});
-
 describe('nextInfo', () => {
-  it('prep → Als Nächstes: Work mit Dauer, Work-Akzent', () => {
+  // Liefert Text + semantisches Tone-Token (Farbe kommt aus CSS), keine Farbstrings.
+  it('prep → Als Nächstes: Work', () => {
     expect(nextInfo({ ...base, phase: 'prep' }, cfg)).toEqual({
-      text: 'Als Nächstes: Work · 0:45', color: 'oklch(0.78 0.16 55)',
+      text: 'Als Nächstes: Work · 0:45', tone: 'work',
     });
   });
-  it('work (weitere folgen) → Als Nächstes: Rest, grün', () => {
+  it('work (weitere folgen) → Als Nächstes: Rest', () => {
     expect(nextInfo({ ...base, phase: 'work', workIdx: 1 }, cfg)).toEqual({
-      text: 'Als Nächstes: Rest · 1:30', color: 'oklch(0.78 0.16 150)',
+      text: 'Als Nächstes: Rest · 1:30', tone: 'rest',
     });
   });
   it('letztes Work im Set → Als Nächstes: Pause', () => {
     expect(nextInfo({ ...base, phase: 'work', workIdx: 3, setIdx: 1 }, cfg)).toEqual({
-      text: 'Als Nächstes: Pause · 3:00', color: 'oklch(0.78 0.16 150)',
+      text: 'Als Nächstes: Pause · 3:00', tone: 'pause',
     });
   });
   it('set-pause → Als Nächstes: Work (nächster Satz)', () => {
     expect(nextInfo({ ...base, phase: 'set-pause', workIdx: 3, setIdx: 1 }, cfg)).toEqual({
-      text: 'Als Nächstes: Work · 0:45', color: 'oklch(0.78 0.16 55)',
+      text: 'Als Nächstes: Work · 0:45', tone: 'work',
     });
   });
   it('letztes Work im letzten Set → Letzte Runde, gedämpft', () => {
     expect(nextInfo({ ...base, phase: 'work', workIdx: 3, setIdx: 2 }, cfg)).toEqual({
-      text: 'Letzte Runde', color: 'rgba(255,255,255,0.4)',
+      text: 'Letzte Runde', tone: 'dim',
     });
   });
   it('done → Workout beendet, gedämpft', () => {
     expect(nextInfo({ ...base, phase: 'done' }, cfg)).toEqual({
-      text: 'Workout beendet', color: 'rgba(255,255,255,0.4)',
+      text: 'Workout beendet', tone: 'dim',
     });
   });
 });

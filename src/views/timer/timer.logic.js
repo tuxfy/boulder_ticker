@@ -1,18 +1,20 @@
 // Reine Timer-Logik ohne DOM/Seiteneffekte — unit-testbar.
+// Keine Präsentationswerte (Farben etc.) hier — die leben in timer.css.
 
 export const PREP_SECS = 10;
 
-// Umfang des Fortschrittskreises (r=138): 2·π·138 ≈ 867.08 — wörtlich aus dem Mockup.
-export const CIRCUMFERENCE = 867.08;
+// Eine Quelle für die Ring-Geometrie: Umfang aus dem Radius abgeleitet,
+// damit SVG-Radius, dasharray und dashOffset nie auseinanderlaufen.
+export const RING_RADIUS = 138;
+export const CIRCUMFERENCE = 2 * Math.PI * RING_RADIUS;
 
-// Phasen-Darstellung (Akzent/Hintergrund/Label/Sub-Label). Werte aus dem Mockup,
-// erweitert um die App-eigenen Phasen prep (GET READY) und set-pause (PAUSE).
-const VISUALS = {
-  work:        { accent: 'oklch(0.78 0.16 55)',  bg: 'oklch(0.21 0.045 50)',  label: 'WORK',      sub: 'Gib alles' },
-  rest:        { accent: 'oklch(0.78 0.16 150)', bg: 'oklch(0.21 0.045 155)', label: 'REST',      sub: 'Durchatmen' },
-  'set-pause': { accent: 'oklch(0.78 0.16 150)', bg: 'oklch(0.21 0.045 155)', label: 'PAUSE',     sub: 'Satz geschafft – kurz durchatmen' },
-  prep:        { accent: 'oklch(0.85 0.02 150)', bg: 'oklch(0.18 0.01 150)',  label: 'GET READY', sub: 'Mach dich bereit' },
-  done:        { accent: 'oklch(0.85 0.02 150)', bg: 'oklch(0.18 0.01 150)',  label: 'DONE',      sub: 'Alle Sätze geschafft' },
+// Phasen-Inhalt (Label + Sub-Label). Farben gehören in timer.css (data-phase).
+const CONTENT = {
+  work:        { label: 'WORK',      sub: 'Gib alles' },
+  rest:        { label: 'REST',      sub: 'Durchatmen' },
+  'set-pause': { label: 'PAUSE',     sub: 'Satz geschafft – kurz durchatmen' },
+  prep:        { label: 'GET READY', sub: 'Mach dich bereit' },
+  done:        { label: 'DONE',      sub: 'Alle Sätze geschafft' },
 };
 
 // Phasen-Zustandsmaschine: aktueller Zustand + Konfiguration → Folgezustand.
@@ -22,29 +24,22 @@ export function nextPhase(state, cfg) {
   const { phase, workIdx, setIdx } = state;
 
   if (phase === 'prep') {
-    return { ...state, phase: 'work', timeLeft: cfg.work };
+    return { ...state, phase: 'work' };
   }
   if (phase === 'work') {
     const lastWork = workIdx >= cfg.numWork;
     const lastSet  = setIdx  >= cfg.numSets;
     if (lastWork && lastSet) return { ...state, phase: 'done' };
-    if (lastWork)            return { ...state, phase: 'set-pause', timeLeft: cfg.setPause };
-    return { ...state, phase: 'rest', timeLeft: cfg.rest };
+    if (lastWork)            return { ...state, phase: 'set-pause' };
+    return { ...state, phase: 'rest' };
   }
   if (phase === 'rest') {
-    return { ...state, phase: 'work', timeLeft: cfg.work, workIdx: workIdx + 1 };
+    return { ...state, phase: 'work', workIdx: workIdx + 1 };
   }
   if (phase === 'set-pause') {
-    return { ...state, phase: 'work', timeLeft: cfg.work, setIdx: setIdx + 1, workIdx: 1 };
+    return { ...state, phase: 'work', setIdx: setIdx + 1, workIdx: 1 };
   }
   return state;
-}
-
-// Sekunden → "m:ss".
-export function formatTime(secs) {
-  const m = Math.floor(secs / 60);
-  const s = secs % 60;
-  return `${m}:${s.toString().padStart(2, '0')}`;
 }
 
 // Millisekunden → "m:ss", auf ganze Sekunden aufgerundet (wie Mockup fmt()).
@@ -76,7 +71,7 @@ export function dashOffset(prog) {
 }
 
 export function phaseVisual(phase) {
-  return VISUALS[phase] ?? VISUALS.prep;
+  return CONTENT[phase] ?? CONTENT.prep;
 }
 
 export function phaseLabel(phase) {
@@ -98,24 +93,16 @@ export function segmentFills(phase, workIdx, numWork, prog) {
   return out;
 }
 
-// Balkenfarbe: Work/Rest Work-Akzent (orange, wie Mockup), Set-Pause grün, Done neutral.
-export function segmentColor(phase) {
-  if (phase === 'done') return VISUALS.done.accent;
-  if (phase === 'set-pause') return VISUALS['set-pause'].accent;
-  return VISUALS.work.accent;
-}
-
 const NEXT_SHORT = { work: 'Work', rest: 'Rest', 'set-pause': 'Pause' };
+const NEXT_TONE  = { work: 'work', rest: 'rest', 'set-pause': 'pause' };
 
-// „Als Nächstes"-Hinweis: Text + Punktfarbe.
+// „Als Nächstes"-Hinweis: Text + semantisches Tone-Token (Farbe kommt aus CSS).
 export function nextInfo(state, cfg) {
-  const dim = 'rgba(255,255,255,0.4)';
-  if (state.phase === 'done') return { text: 'Workout beendet', color: dim };
+  if (state.phase === 'done') return { text: 'Workout beendet', tone: 'dim' };
   const ns = nextPhase(state, cfg);
-  if (ns.phase === 'done') return { text: 'Letzte Runde', color: dim };
-  const label = NEXT_SHORT[ns.phase] ?? phaseVisual(ns.phase).label;
+  if (ns.phase === 'done') return { text: 'Letzte Runde', tone: 'dim' };
   return {
-    text: `Als Nächstes: ${label} · ${formatMs(phaseDurationMs(ns.phase, cfg))}`,
-    color: phaseVisual(ns.phase).accent,
+    text: `Als Nächstes: ${NEXT_SHORT[ns.phase]} · ${formatMs(phaseDurationMs(ns.phase, cfg))}`,
+    tone: NEXT_TONE[ns.phase],
   };
 }

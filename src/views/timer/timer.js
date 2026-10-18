@@ -3,9 +3,9 @@ import { navigate } from '../../core/router.js';
 import { unlockAudio, playBeep, playFinish, requestWakeLock, releaseWakeLock } from '../../core/audio.js';
 import * as store from '../../core/store.js';
 import {
-  nextPhase, PREP_SECS, CIRCUMFERENCE,
+  nextPhase, PREP_SECS, CIRCUMFERENCE, RING_RADIUS,
   formatMs, phaseDurationMs, progress, dashOffset,
-  phaseVisual, segmentFills, segmentColor, nextInfo,
+  phaseVisual, segmentFills, nextInfo,
 } from './timer.logic.js';
 
 const TEMPLATE = `
@@ -91,8 +91,8 @@ const TEMPLATE = `
 
         <div class="timer-ring">
           <svg viewBox="0 0 300 300" aria-hidden="true">
-            <circle class="timer-ring-track" cx="150" cy="150" r="138"></circle>
-            <circle class="timer-ring-prog" id="timer-ring-prog" cx="150" cy="150" r="138"
+            <circle class="timer-ring-track" cx="150" cy="150" r="${RING_RADIUS}"></circle>
+            <circle class="timer-ring-prog" id="timer-ring-prog" cx="150" cy="150" r="${RING_RADIUS}"
                     stroke-dasharray="${CIRCUMFERENCE}" stroke-dashoffset="${CIRCUMFERENCE}"></circle>
           </svg>
           <div class="timer-ring-center">
@@ -242,9 +242,8 @@ function renderTimer() {
   const prog = progress(remainingMs, dur);
   const vis  = phaseVisual(phase);
 
-  const display = document.getElementById('timer-display');
-  display.style.background = vis.bg;
-  display.style.setProperty('--accent', vis.accent);
+  // Farben liefert timer.css über data-phase — hier nur die Phase als Datenattribut.
+  document.getElementById('timer-display').dataset.phase = phase;
 
   document.getElementById('timer-phase').textContent = vis.label;
   document.getElementById('timer-time').textContent  = formatMs(Math.max(0, remainingMs));
@@ -253,29 +252,26 @@ function renderTimer() {
   document.getElementById('timer-ring-prog')
     .setAttribute('stroke-dashoffset', dashOffset(prog).toFixed(2));
 
-  renderSegments(segmentFills(phase, workIdx, cfg.numWork, prog), segmentColor(phase));
+  renderSegments(segmentFills(phase, workIdx, cfg.numWork, prog));
 
   document.getElementById('timer-work').textContent = `${Math.min(workIdx, cfg.numWork)} / ${cfg.numWork}`;
   document.getElementById('timer-set').textContent  = `${Math.min(setIdx, cfg.numSets)} / ${cfg.numSets}`;
 
   const nx = nextInfo(tState, cfg);
   document.getElementById('timer-next-text').textContent = nx.text;
-  document.getElementById('timer-next-dot').style.background = nx.color;
+  document.getElementById('timer-next-dot').dataset.tone = nx.tone;
 
   const toggle = document.getElementById('btn-toggle');
   toggle.textContent = phase === 'done' ? 'Neu starten' : (tState.paused ? 'Weiter' : 'Pause');
 }
 
-function renderSegments(fills, color) {
+function renderSegments(fills) {
   const wrap = document.getElementById('timer-segments');
   if (wrap.children.length !== fills.length) {
     wrap.innerHTML = fills.map(() => '<div class="timer-seg"><div class="timer-seg-fill"></div></div>').join('');
   }
-  fills.forEach((f, i) => {
-    const fill = wrap.children[i].firstElementChild;
-    fill.style.width = `${f * 100}%`;
-    fill.style.background = color;
-  });
+  // Füllfarbe kommt per CSS-Variable (--seg) aus timer.css; hier nur die Breite.
+  fills.forEach((f, i) => { wrap.children[i].firstElementChild.style.width = `${f * 100}%`; });
 }
 
 function timerToggle() {

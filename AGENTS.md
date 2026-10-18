@@ -107,6 +107,10 @@ Für UI aus einem Mockup gilt dieser Ablauf, damit die Umsetzung die Vorlage **e
     - *Werte-Abweichung* (z. B. kontinuierliche ms-Zeit vs. Ganzsekunden): Agent legt sie **offen, der Nutzer entscheidet** (App anpassen oder dokumentierte Abweichung). Nie stillschweigend approximieren.
     - *Struktur-Abweichung* (die App kann mehr als das Mockup, z. B. Vorbereitung/Set-Pause ohne Vorlage): Das Mockup ist dann eine **Teilmenge**. Festhalten, welche App-Teile ohne Mockup-Vorlage existieren — für die greift nur die normale Anforderungs-Absicherung, nicht der Mockup-Abgleich.
 4. **Portieren statt paraphrasieren** — die reinen Formeln/Werte 1:1 aus der Quelle als pure Funktionen übernehmen (Berechnung getrennt von der View): app-weite Logik nach `src/core/`, view-spezifische in das co-lokalisierte `*.logic.js` der jeweiligen View (z. B. `src/views/timer/timer.logic.js`).
+    „Portieren" meint die **Fidelity der Werte und Formeln**, nicht die Übernahme der Mockup-*Architektur*. Beim Übernehmen daher nicht die Abkürzungen der Quelle mit-erben:
+    - **Abgeleitete Größen berechnen statt hardcoden** (z. B. Kreis-Umfang aus dem Radius, nicht als Magic-Value).
+    - **Präsentation von Logik trennen** — keine Farben/Style-Werte ins Logik-Modul; die gehören in CSS (bzw. die View).
+    - **Keine vestigialen Felder** aus der Mockup-Struktur mitschleppen, die die App-Umsetzung gar nicht nutzt.
 5. **Per Unit-Test verifizieren** — die portierten Funktionen mit Vitest gegen die Werte prüfen, die die Mockup-Formel an gewählten Zeitpunkten/Zuständen liefert. Das ist die „gleiche Zeitsequenz" auf **Datenebene** — deterministisch und offline, ohne Rendering.
 6. **Optik einmalig abgleichen** — Farben, Abstände, Schrift per Blick gegen das Vorschau-Artifact. Nicht automatisiert; das gebündelte Artifact genügt.
 7. **Definition of Done** — jeder Punkt der Mockup-Spezifikation erfüllt: die portierten Formeln per Unit-Test bestätigt, die Optik gegen die Vorschau abgeglichen. „Sieht plausibel aus" reicht nicht.

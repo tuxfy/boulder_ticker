@@ -51,8 +51,12 @@
 .btn-timer-start:active { background: #ddd; }
 
 /* ── Laufansicht (Redesign nach Mockup) ── */
+/* Einzige Farbquelle der Laufansicht: Phasenfarben als Custom Properties,
+   gescopet auf #timer-display[data-phase]. Keine Farbwerte im JS, nichts in :root/base.css. */
 #timer-display {
-  --accent: oklch(0.85 0.02 150);
+  --accent: oklch(0.85 0.02 150); /* Default = neutral (prep/done) */
+  --bg: oklch(0.18 0.01 150);
+  --seg: oklch(0.78 0.16 55);
   flex: 1;
   display: flex;
   flex-direction: column;
@@ -61,10 +65,15 @@
   gap: 28px;
   padding: 8px 20px 24px;
   color: #f3f4f2;
-  background: oklch(0.18 0.01 150);
+  background: var(--bg);
   transition: background 600ms ease;
   font-family: -apple-system, system-ui, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
 }
+#timer-display[data-phase="work"]      { --accent: oklch(0.78 0.16 55);  --bg: oklch(0.21 0.045 50);  --seg: oklch(0.78 0.16 55); }
+#timer-display[data-phase="rest"]      { --accent: oklch(0.78 0.16 150); --bg: oklch(0.21 0.045 155); --seg: oklch(0.78 0.16 55); }
+#timer-display[data-phase="set-pause"] { --accent: oklch(0.78 0.16 150); --bg: oklch(0.21 0.045 155); --seg: oklch(0.78 0.16 150); }
+#timer-display[data-phase="prep"]      { --accent: oklch(0.85 0.02 150); --bg: oklch(0.18 0.01 150); }
+#timer-display[data-phase="done"]      { --accent: oklch(0.85 0.02 150); --bg: oklch(0.18 0.01 150); --seg: oklch(0.85 0.02 150); }
 
 /* Work / Set Chips */
 .timer-meta {
@@ -156,6 +165,7 @@
   height: 100%;
   width: 0;
   border-radius: 3px;
+  background: var(--seg);
   transition: width 120ms linear;
 }
 
@@ -173,6 +183,10 @@
   color: rgba(255, 255, 255, 0.7);
 }
 .timer-next-dot { width: 8px; height: 8px; border-radius: 50%; background: rgba(255, 255, 255, 0.4); }
+.timer-next-dot[data-tone="work"]  { background: oklch(0.78 0.16 55); }
+.timer-next-dot[data-tone="rest"]  { background: oklch(0.78 0.16 150); }
+.timer-next-dot[data-tone="pause"] { background: oklch(0.78 0.16 150); }
+.timer-next-dot[data-tone="dim"]   { background: rgba(255, 255, 255, 0.4); }
 
 /* Steuerung */
 .timer-controls {
