@@ -13,8 +13,8 @@ test.describe('Timer', () => {
     await expect(page.locator('#timer-config')).toBeVisible();
     await expect(page.locator('#timer-display')).toBeHidden();
 
-    const workRow = page.locator('.timer-param').filter({ has: page.locator('#val-work') });
-    await workRow.getByRole('button', { name: '+' }).click();
+    const workRow = page.locator('.timer-cfg-row').filter({ has: page.locator('#val-work') });
+    await workRow.getByRole('button', { name: 'Mehr' }).click();
 
     await expect(page.locator('#val-work')).toHaveValue('46');
 

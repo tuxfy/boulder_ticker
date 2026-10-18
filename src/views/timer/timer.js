@@ -15,68 +15,55 @@ const TEMPLATE = `
     </header>
     <div class="tool-content" id="timer-content">
 
-      <!-- CONFIG -->
+      <!-- CONFIG (Redesign nach Mockup) -->
       <div id="timer-config">
-        <div class="timer-params">
-          <div class="timer-param">
-            <span class="timer-param-label">Work</span>
-            <div class="timer-param-right">
-              <div class="stepper timer-stepper">
-                <button type="button" data-adjust="work" data-delta="-1">−</button>
-                <input type="text" inputmode="numeric" pattern="[0-9]*" id="val-work" value="45"
-                       data-param="work">
-                <button type="button" data-adjust="work" data-delta="1">+</button>
-              </div>
-              <span class="timer-param-unit">s</span>
+        <div class="timer-cfg-group">
+          <div class="timer-cfg-row" data-field="sets">
+            <span class="timer-cfg-label">Sets</span>
+            <div class="timer-cfg-stepper">
+              <button type="button" data-adjust="numSets" data-delta="-1" aria-label="Weniger">−</button>
+              <input type="text" inputmode="numeric" pattern="[0-9]*" id="val-numSets" value="2" data-param="numSets">
+              <button type="button" data-adjust="numSets" data-delta="1" aria-label="Mehr">+</button>
             </div>
+            <span class="timer-cfg-unit"></span>
           </div>
-          <div class="timer-param">
-            <span class="timer-param-label">Rest</span>
-            <div class="timer-param-right">
-              <div class="stepper timer-stepper">
-                <button type="button" data-adjust="rest" data-delta="-1">−</button>
-                <input type="text" inputmode="numeric" pattern="[0-9]*" id="val-rest" value="90"
-                       data-param="rest">
-                <button type="button" data-adjust="rest" data-delta="1">+</button>
-              </div>
-              <span class="timer-param-unit">s</span>
+          <div class="timer-cfg-row" data-field="pause">
+            <span class="timer-cfg-label">Pause</span>
+            <div class="timer-cfg-stepper">
+              <button type="button" data-adjust="setPause" data-delta="-1" aria-label="Weniger">−</button>
+              <input type="text" inputmode="numeric" pattern="[0-9]*" id="val-setPause" value="180" data-param="setPause">
+              <button type="button" data-adjust="setPause" data-delta="1" aria-label="Mehr">+</button>
             </div>
+            <span class="timer-cfg-unit">s</span>
           </div>
-          <div class="timer-param">
-            <span class="timer-param-label">Anzahl Work</span>
-            <div class="timer-param-right">
-              <div class="stepper timer-stepper">
-                <button type="button" data-adjust="numWork" data-delta="-1">−</button>
-                <input type="text" inputmode="numeric" pattern="[0-9]*" id="val-numWork" value="5"
-                       data-param="numWork">
-                <button type="button" data-adjust="numWork" data-delta="1">+</button>
-              </div>
-              <span class="timer-param-unit"></span>
+        </div>
+        <div class="timer-cfg-group">
+          <div class="timer-cfg-row" data-field="work">
+            <span class="timer-cfg-label">Work</span>
+            <div class="timer-cfg-stepper">
+              <button type="button" data-adjust="work" data-delta="-1" aria-label="Weniger">−</button>
+              <input type="text" inputmode="numeric" pattern="[0-9]*" id="val-work" value="45" data-param="work">
+              <button type="button" data-adjust="work" data-delta="1" aria-label="Mehr">+</button>
             </div>
+            <span class="timer-cfg-unit">s</span>
           </div>
-          <div class="timer-param">
-            <span class="timer-param-label">Anzahl Sets</span>
-            <div class="timer-param-right">
-              <div class="stepper timer-stepper">
-                <button type="button" data-adjust="numSets" data-delta="-1">−</button>
-                <input type="text" inputmode="numeric" pattern="[0-9]*" id="val-numSets" value="2"
-                       data-param="numSets">
-                <button type="button" data-adjust="numSets" data-delta="1">+</button>
-              </div>
-              <span class="timer-param-unit"></span>
+          <div class="timer-cfg-row" data-field="rounds">
+            <span class="timer-cfg-label">Rounds</span>
+            <div class="timer-cfg-stepper">
+              <button type="button" data-adjust="numWork" data-delta="-1" aria-label="Weniger">−</button>
+              <input type="text" inputmode="numeric" pattern="[0-9]*" id="val-numWork" value="5" data-param="numWork">
+              <button type="button" data-adjust="numWork" data-delta="1" aria-label="Mehr">+</button>
             </div>
+            <span class="timer-cfg-unit"></span>
           </div>
-          <div class="timer-param">
-            <span class="timer-param-label">Set-Pause</span>
-            <div class="timer-param-right">
-              <div class="stepper timer-stepper">
-                <button type="button" data-adjust="setPause" data-delta="-1">−</button>
-                <input type="text" inputmode="numeric" pattern="[0-9]*" id="val-setPause" value="180"
-                       data-param="setPause">
-                <button type="button" data-adjust="setPause" data-delta="1">+</button>
-              </div>
-              <span class="timer-param-unit">s</span>
+          <div class="timer-cfg-row" data-field="rest">
+            <span class="timer-cfg-label">Rest</span>
+            <div class="timer-cfg-stepper">
+              <button type="button" data-adjust="rest" data-delta="-1" aria-label="Weniger">−</button>
+              <input type="text" inputmode="numeric" pattern="[0-9]*" id="val-rest" value="90" data-param="rest">
+              <button type="button" data-adjust="rest" data-delta="1" aria-label="Mehr">+</button>
             </div>
+            <span class="timer-cfg-unit">s</span>
           </div>
         </div>
         <button class="btn-timer-start" data-action="start">Start</button>
