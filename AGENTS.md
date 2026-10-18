@@ -7,8 +7,10 @@
 ## Ablage & Lebenszyklus
 
 -   Neue Anforderungen/Issues werden **standardmäßig im Unterordner `anforderungen/backlog/`** angelegt — **unsortiert, ohne Nummernpräfix**, Status `new`.
--   Setzt **der Nutzer** den Status auf `refined`, wandert das Dokument aus `backlog/` heraus nach `anforderungen/` und erhält die **nächste freie laufende Nummer** (es sortiert sich damit unten an). Erst dann ist es für die Umsetzung vorgesehen.
+-   Setzt **der Nutzer** den Status auf `refined`, wandert das Dokument aus `backlog/` heraus nach `anforderungen/` und erhält die **nächste freie laufende Nummer**. Erst dann ist es für die Umsetzung vorgesehen.
+-   Die **nächste freie Nummer** ist **die höchste bereits vergebene Nummer + 1** — ermittelt über **beide** Orte: `anforderungen/` (aktive, refined/in progress) **und** `anforderungen/done/`. Da die abgeschlossenen (und damit meist höchstnummerierten) Dokumente in `done/` liegen, ist dieser Ordner die maßgebliche Quelle. **Nummern werden nie wiederverwendet.**
 -   Erst nach explizitem **„Go"** des Nutzers beginnt die Umsetzung.
+-   Wird eine Anforderung auf **`done`** gesetzt, wandert sie **mit ihrer Nummer** in den Unterordner **`anforderungen/done/`**. Der aktive Ordner `anforderungen/` enthält damit nur Dokumente in Arbeit (refined / in progress).
 
 Anforderungen folgen diesem Aufbau:
 
@@ -76,7 +78,7 @@ Secrets (API-Tokens, Passwörter, Schlüssel) werden niemals ausgegeben oder gel
 7. **Implementieren (Green)**
 8. **Nach der Änderung lässt der Nutzer die Tests laufen** (`npm test`) und bestätigt das Ergebnis — **bevor** irgendein AK-Punkt abgehakt wird. Alle Tests müssen grün sein
 9. Jeden AK-Punkt prüfen und abhaken
-10. Status auf `done` setzen
+10. Status auf `done` setzen und das Dokument **mit seiner Nummer nach `anforderungen/done/`** verschieben
 
 Wird im Gespräch eine neue Idee oder Erweiterung besprochen, wird **zuerst** ein Anforderungsdokument angelegt (oder ein bestehendes ergänzt), bevor irgendein Code geschrieben oder geplant wird.
 
